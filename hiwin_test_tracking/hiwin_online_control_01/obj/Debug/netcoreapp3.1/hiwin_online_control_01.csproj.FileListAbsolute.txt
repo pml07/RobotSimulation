@@ -1,0 +1,56 @@
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.exe
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.deps.json
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.json
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.dev.json
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.AssemblyReference.cache
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfoInputs.cache
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfo.cs
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.CoreCompileInputs.cache
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.genruntimeconfig.cache
+D:\_My file 02 NCKU\110下\220309_Hiwin_online_control\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.GeneratedMSBuildEditorConfig.editorconfig
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.exe
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.deps.json
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.json
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.dev.json
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.AssemblyReference.cache
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.GeneratedMSBuildEditorConfig.editorconfig
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfoInputs.cache
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfo.cs
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.CoreCompileInputs.cache
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+D:\0_Git\Hiwin_HRSDK_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.genruntimeconfig.cache
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.exe
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.deps.json
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.json
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.dev.json
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.AssemblyReference.cache
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfoInputs.cache
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfo.cs
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.CoreCompileInputs.cache
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+C:\Users\20210303\hiwin_hrsdk_body_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.genruntimeconfig.cache
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.exe
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.deps.json
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.json
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.runtimeconfig.dev.json
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\bin\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.AssemblyReference.cache
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfoInputs.cache
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.AssemblyInfo.cs
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.csproj.CoreCompileInputs.cache
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.dll
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.pdb
+C:\Users\20210303\hiwin_test_tracking\hiwin_online_control_01\obj\Debug\netcoreapp3.1\hiwin_online_control_01.genruntimeconfig.cache

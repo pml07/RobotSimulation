@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "hiwin_online_control_01/1.0.0": {
+        "runtime": {
+          "hiwin_online_control_01.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "hiwin_online_control_01/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
