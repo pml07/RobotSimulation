@@ -7,7 +7,7 @@ import math
 
 # socket
 UDP_IP = '127.0.0.1'
-UDP_PORT = 5065
+UDP_PORT = 5055
 socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
 # angle
@@ -24,7 +24,7 @@ def angle(v1, v2):
   return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 
 # mediapipe
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)
 mpPose = mp.solutions.pose
 pose = mpPose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5, static_image_mode=False, model_complexity=1)
 
@@ -32,9 +32,9 @@ mpDraw = mp.solutions.drawing_utils
 poseLmsStyle = mpDraw.DrawingSpec(color=(0, 0, 0), thickness=3)
 poseConStyle = mpDraw.DrawingSpec(color=(255, 255, 255), thickness=5)
 
-# width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 影像寬度
-# height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 影像高度
-# fps = int(cap.get(cv2.CAP_PROP_FPS))  # fps
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 影像寬度
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 影像高度
+fps = int(cap.get(cv2.CAP_PROP_FPS))  # fps
 
 angle1 = 0
 a1_last = 0
@@ -57,7 +57,7 @@ a6_f = 0
 
 ### save realtime video
 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-out = cv2.VideoWriter('1207_1_tpose.avi', fourcc, 5.0, (640, 480))
+out = cv2.VideoWriter('1208_0.avi', fourcc, 5.0, (width, height))
 while True:
   ret, img = cap.read()
   if not ret:
@@ -103,25 +103,31 @@ while True:
     z = (0,0,1)
     
     if joint_list[11][3] > 0.8 and joint_list[13][3] > 0.8 and joint_list[15][3] > 0.8:
+      in_pin = cross(index, pinky)
+      # angle4 = round(math.degrees(angle((0,in_pin[1],in_pin[2]),z)),3)
+      arm_fore = cross((-arm[0],-arm[1],-arm[2]),forearm)
+      
       # J3角度
-      J3 = round(math.degrees(angle(arm, forearm)),3)
-      angle3 = J3 + 90
+      elbow = round(math.degrees(angle(arm, forearm)),3)
+      angle3 = elbow + 90
+      # J3方向
+      
       # print(angle3)
+      
       if 0 <= abs(angle3) <= 60:
         angle6 = 0
       elif 60 < abs(angle3) <= 120:
         # 食指小指平面法向量
         in_pin = cross(index, pinky)
         angle6 = round(math.degrees(angle((0,in_pin[1],in_pin[2]),z)),3)
+      
       # 手腕J5
       angle5 = round(math.degrees(angle(forearm,index)),3)
       # J2角度
       angle2 = round(math.degrees(angle((shoulder[0],shoulder[1],0),(arm[0],arm[1],0))),3)
       # J2方向
       # print(angle2)
-      in_pin = cross(index, pinky)
-      angle4 = round(math.degrees(angle((0,in_pin[1],in_pin[2]),z)),3)
-      arm_fore = cross((-arm[0],-arm[1],-arm[2]),forearm)
+      
       # J4角度
       J4 = round(math.degrees(angle(in_pin,arm_fore)),3)
       # J4方向
@@ -132,11 +138,11 @@ while True:
       # J1角度
       J1 = round(math.degrees(angle((0,arm_fore[1],arm_fore[2]),(0,hip_shou[1],hip_shou[2]))),3)
       # J1方向
-      cross_arm_fore = cross(arm_fore,(hip_shou[0],hip_shou[1],hip_shou[2]))
-      dir_arm_fore = dotproduct(cross_arm_fore,arm)
-      dir_arm_fore /= abs(dir_arm_fore)
-      angle1 = J1*dir_arm_fore
-      print(angle1)
+      # cross_arm_fore = cross(arm_fore,(hip_shou[0],hip_shou[1],hip_shou[2]))
+      # dir_arm_fore = dotproduct(cross_arm_fore,arm)
+      # dir_arm_fore /= abs(dir_arm_fore)
+      # angle1 = J1*dir_arm_fore
+      # print(angle1)
 
 
 # J1: -165~+165

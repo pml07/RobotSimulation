@@ -8,6 +8,8 @@ namespace hiwin_online_control_01
     class Movement_handle
     { 
         static int Robot_ID;
+        static HRobot.CallBackFun Callbackfunc;
+
         unsafe static void Main(string[] args)
         {
             Console.WriteLine("Done!!");
@@ -36,14 +38,17 @@ namespace hiwin_online_control_01
 
         public static unsafe void OPENconnect()
         {
-            Robot_ID = HRobot.open_connection("192.168.1.102", 1, Test);  // robot ip 
+            //Robot_ID = HRobot.open_connection("192.168.1.102", 1, new HRobot.CallBackFun(Test));
+            Callbackfunc = new HRobot.CallBackFun(Test);
+            Robot_ID = HRobot.open_connection("192.168.1.102", 1, Callbackfunc);  // robot ip 
             HRobot.set_operation_mode(Robot_ID, 1);
+            Console.WriteLine("回傳結果" + Robot_ID);
         }
         public static void DISconnect()
-            {
+        {
             HRobot.motion_abort(Robot_ID);
             HRobot.disconnect(Robot_ID);
-            }
+        }
 
         public static void Speed(int PTP_v, double LIN_v)
         {
@@ -53,11 +58,123 @@ namespace hiwin_online_control_01
         public static void OVSpeed(int v)
         {
             HRobot.set_override_ratio(Robot_ID, v); // 整體速度
-
+        }
+       
+        public static void Current_pos(double[] coor)
+        {
+            HRobot.get_current_position(Robot_ID, coor);
         }
 
-        unsafe static void Test(ushort cmd, ushort rlt, char* msg, int len)
+
+        unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len)
         {
+            switch(cmd)
+            {
+                case 0:
+                    if(rlt==4030)
+                    {
+                        Console.WriteLine("HRSS_ALARM_NOTIFY");
+                    }
+                    else if(rlt==4031)
+                    {
+                        Console.WriteLine("HRSS_BATTERY_WARNING");
+                    }
+                    else if(rlt==4032)
+                    {
+                        Console.WriteLine("HRSS_BATTERY_ALARM");
+                    }
+                    else if (rlt == 4034)
+                    {
+                        Console.WriteLine("網路通訊訊息");
+                    }
+                    else if (rlt == 4035)
+                    {
+                        Console.WriteLine("RS232通訊訊息");
+                    }
+                    else if (rlt == 4702)
+                    {
+                        Console.WriteLine(rlt);
+                        Console.WriteLine(cmd);
+                        Console.WriteLine(*msg);
+                    }
+                    else if (rlt == 4716)
+                    {
+
+                    }
+                    break;
+                case 13:
+                    Console.WriteLine("網路斷線");
+                    break;
+                case 1450:
+                    switch(rlt)
+                    {
+                        case 4028:
+                            Console.WriteLine("HRSS_START_CLEAR_ALARM");
+                            break;
+                        case 4029:
+                            Console.WriteLine("HRSS_FINISH_CLEAR_ALARM");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 4001:
+                    switch(rlt)
+                    {
+                        case 4011:
+                            Console.WriteLine("ERROR_OPEN_FILE");
+                            break;
+                        case 4014:
+                            Console.WriteLine("HRSS_TASK_START_FINISH");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 4011:
+                    switch(rlt)
+                    {
+                        case 4020:
+                            Console.WriteLine("HRSS_UPDATE_FILE_ERROR");
+                            break;
+                        case 4021:
+                            Console.WriteLine("HRSS_UPDATE+FILE_TRANSFER_ERROR");
+                            break;
+                        case 4022:
+                            Console.WriteLine("HRSS_UPDATE_FILE_UNARCHIVER_ERROR");
+                            break;
+                        case 4023:
+                            Console.WriteLine("HRSS_HARD_DISK_CAPACITY_IS_NOT_ENOUGH");
+                            break;
+                        case 4026:
+                            Console.WriteLine("HRSS_START_UPDATE");
+                            break;
+                        case 4027:
+                            Console.WriteLine("HRSS_UPDATE_FILE_TRANSFER_SUCCESS");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 4202:
+                    switch (rlt)
+                    {
+                        case 0:
+                            Console.WriteLine("TCPIP success");
+                            break;
+                        case 9999:
+                            Console.WriteLine("TCPIP failed");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 4701:
+                    Console.WriteLine("API 解析失敗");
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
