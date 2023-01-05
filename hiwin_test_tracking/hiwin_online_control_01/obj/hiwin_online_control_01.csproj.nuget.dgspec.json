@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pml\\hiwin_hrsdk_body_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj": {}
+    "C:\\Users\\20210303\\hiwin_test_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pml\\hiwin_hrsdk_body_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj": {
+    "C:\\Users\\20210303\\hiwin_test_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pml\\hiwin_hrsdk_body_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj",
+        "projectUniqueName": "C:\\Users\\20210303\\hiwin_test_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj",
         "projectName": "hiwin_online_control_01",
-        "projectPath": "C:\\Users\\pml\\hiwin_hrsdk_body_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj",
-        "packagesPath": "C:\\Users\\pml\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pml\\hiwin_hrsdk_body_tracking\\hiwin_online_control_01\\obj\\",
+        "projectPath": "C:\\Users\\20210303\\hiwin_test_tracking\\hiwin_online_control_01\\hiwin_online_control_01.csproj",
+        "packagesPath": "C:\\Users\\20210303\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\20210303\\hiwin_test_tracking\\hiwin_online_control_01\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\pml\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\20210303\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

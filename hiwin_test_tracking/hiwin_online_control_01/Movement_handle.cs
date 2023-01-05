@@ -69,7 +69,7 @@ namespace hiwin_online_control_01
             HRobot.get_timer(Robot_ID, 1);
         }
 
-        unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len)
+        unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len) //alarm msg
         {
             switch(cmd)
             {

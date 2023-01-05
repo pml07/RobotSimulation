@@ -11,7 +11,7 @@ using SDKHrobot;
 
 namespace hiwin_online_control_01
 {
-    class receive_from_python : receive_from_pythonBase
+    class receive_from_python
     {
         static Socket server;
         static readonly int Robot_ID;
@@ -28,7 +28,7 @@ namespace hiwin_online_control_01
             int time_start = HRobot.set_timer_start(Robot_ID, 1);
 
             int starttime = HRobot.get_timer(Robot_ID, 1);
-            Console.WriteLine("starttime" + starttime);
+            Console.WriteLine("start_time" + starttime);
 
             Thread t = new Thread(ReceiveMsg);
             t.Start();
@@ -66,19 +66,19 @@ namespace hiwin_online_control_01
                 Console.WriteLine(point.ToString());
 
                 int rectime = HRobot.get_timer(Robot_ID, 1);
-                Console.WriteLine("rectime:" + rectime);
+                Console.WriteLine("receive_time" + rectime);
 
-                if (message.Contains("?"))
+                if (message.Contains(","))
                 {
-                    string[] a1a6 = message.Split(new string[] { "?" }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] a1a6 = message.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
-                    double[] a1to6 = new double[6] { Convert.ToDouble(a1a6[0]), Convert.ToDouble(a1a6[1]), Convert.ToDouble(a1a6[2]), 0, 0, 0 };
+                    double[] a1to6 = new double[6] { Convert.ToDouble(a1a6[0]), Convert.ToDouble(a1a6[1]), Convert.ToDouble(a1a6[2]), Convert.ToDouble(a1a6[3]), Convert.ToDouble(a1a6[4]), Convert.ToDouble(a1a6[5]) };
 
                     Console.WriteLine("[{0}]", string.Join(", ", a1to6));
                     Movement_handle.RunPosAxis(a1to6.Take(6).ToArray());                    
 
                     int p2ptime = HRobot.get_timer(Robot_ID, 1);
-                    Console.WriteLine("p2ptime:"+ p2ptime);
+                    Console.WriteLine("p2p_time"+p2ptime);
                 }
                 else
                 {

@@ -243,7 +243,7 @@ while True:
         send_switch +=1
       a6_last = angle6
 
-    send_ = str(a1_f)+'?'+str(a2_f)+'?'+str(a3_f)+'?'+str(a4_f)+'?'+str(a5_f)+'?'+str(a6_f)
+    send_ = str(a1_f)+','+str(a2_f)+','+str(a3_f)+','+str(a4_f)+','+str(a5_f)+','+str(a6_f)
     print(send_)
     if send_switch > 0:
       socket.sendto((str(send_)).encode(),(UDP_IP,UDP_PORT))
