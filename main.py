@@ -6,26 +6,15 @@ import numpy as np
 import math
 import os
 from apis.api import login, device_add, device_action
-from dotenv import load_dotenv
+from config import UDP_IP, UDP_PORT, USER_DATA, DEVICE_DATA
 
-load_dotenv('.env')
 ### socket
-UDP_IP = os.getenv('UDP_IP','127.0.0.1')
-UDP_PORT = int(os.getenv('UDP_PORT',5055))
 socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
-user_data = {
-  "email": os.getenv('USER_EMAIL','admin@test.com'),
-  "password": os.getenv('USER_PASSWORD','123456')
-}
-device_data = {
-  "name": os.getenv('DEVICE_NAME','device_from_robotSim')
-}
-
 if __name__ == '__main__':
-    token=login(user_data)
+    token=login(USER_DATA)
     print(token)
-    device_id=device_add(device_data,token)
+    device_id=device_add(DEVICE_DATA,token)
     print(device_id)
 
 ### angle

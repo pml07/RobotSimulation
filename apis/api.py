@@ -1,6 +1,7 @@
 import requests
+from config import ROS_API_URL
 
-BASE_URL = "https://ros-api.paia-arena.com" + "/api/v1/"
+BASE_URL = ROS_API_URL + "/api/v1/"
 
 def login(data):
   url = BASE_URL + 'auth/login'
