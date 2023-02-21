@@ -8,6 +8,27 @@ using System.Threading;
 using System.Collections;
 using System.Linq;
 
+public static class DotEnv
+{
+    public static void Load(string filePath)
+    {
+        if (!File.Exists(filePath))
+            return;
+
+        foreach (var line in File.ReadAllLines(filePath))
+        {
+            var parts = line.Split(
+                '=',
+                StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length != 2)
+                continue;
+
+            Environment.SetEnvironmentVariable(parts[0], parts[1]);
+        }
+    }
+}
+
 
 public class RobotControl : MonoBehaviour
 {
@@ -36,6 +57,15 @@ public class RobotControl : MonoBehaviour
 
     void Start()
     {
+        var root = Directory.GetCurrentDirectory();
+        var dotenv = Path.Combine(root, ".env");
+        DotEnv.Load(dotenv);
+
+        receiveHost = Environment.GetEnvironmentVariable("UDP_IP");
+        sendHost = Environment.GetEnvironmentVariable("UDP_IP");
+        receivePort = Environment.GetEnvironmentVariable("UDP_RECEIVE_PORT");
+        sendPort = Environment.GetEnvironmentVariable("UDP_SEND_PORT");
+
         server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         server.Bind(new IPEndPoint(IPAddress.Parse(receiveHost), receivePort));
         Debug.Log("------- Listening on port " + receivePort + " -------");
