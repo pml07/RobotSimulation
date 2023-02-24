@@ -1,10 +1,8 @@
 import socket
 import json
-from config import IMPORT_FILE_NAME, ROS_API_BASE_URL, UDP_IP, UDP_RECEIVE_PORT, UDP_SEND_PORT, USER_DATA, DEVICE_DATA
+from config import IMPORT_FILE_NAME, UDP_IP, UDP_RECEIVE_PORT, UDP_SEND_PORT, USER_DATA, DEVICE_DATA
 from apis.api import login, device_add_to_db, device_update_action_to_db
 from libs.CaptureVideo import CaptureVideo
-
-ROS_API_URL = ROS_API_BASE_URL + "/api/v1/"
 
 # send
 send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
