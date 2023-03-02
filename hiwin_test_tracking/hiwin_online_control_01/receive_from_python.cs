@@ -11,24 +11,18 @@ using SDKHrobot;
 
 namespace hiwin_online_control_01
 {
-    class receive_from_python
+    class Receive_from_python
     {
         static Socket server;
         static readonly int Robot_ID;
         static void Main(string[] args)
         {
             Movement_handle.OPENconnect();
-            Movement_handle.OVSpeed(90); // 整體速度百分比
+            Movement_handle.OVSpeed(95);
             Movement_handle.Speed(100, 2200);
-
             server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5055));
+            server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5065));
             Console.WriteLine("------------- Robot Arm Connected -------------");
-
-            int time_start = HRobot.set_timer_start(Robot_ID, 1);
-
-            int starttime = HRobot.get_timer(Robot_ID, 1);
-            Console.WriteLine("start_time" + starttime);
 
             Thread t = new Thread(ReceiveMsg);
             t.Start();
@@ -62,23 +56,23 @@ namespace hiwin_online_control_01
                 int length = server.ReceiveFrom(buffer, ref point);
 
                 string message = Encoding.UTF8.GetString(buffer, 0, length);
-                Console.WriteLine(message);
-                Console.WriteLine(point.ToString());
+                //Console.WriteLine(message);
+                //Console.WriteLine(point.ToString());
 
-                int rectime = HRobot.get_timer(Robot_ID, 1);
-                Console.WriteLine("receive_time" + rectime);
-
-                if (message.Contains(","))
+                if (message.Contains(";"))
                 {
-                    string[] a1a6 = message.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-
+                    string[] a1a6 = message.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                     double[] a1to6 = new double[6] { Convert.ToDouble(a1a6[0]), Convert.ToDouble(a1a6[1]), Convert.ToDouble(a1a6[2]), Convert.ToDouble(a1a6[3]), Convert.ToDouble(a1a6[4]), Convert.ToDouble(a1a6[5]) };
 
                     Console.WriteLine("[{0}]", string.Join(", ", a1to6));
-                    Movement_handle.RunPosAxis(a1to6.Take(6).ToArray());                    
-
-                    int p2ptime = HRobot.get_timer(Robot_ID, 1);
-                    Console.WriteLine("p2p_time"+p2ptime);
+                    Movement_handle.RunPosAxis(a1to6.Take(6).ToArray());
+                    
+                    //double[] jointAngles = new double[6];
+                    //Movement_handle.Current_joint(jointAngles);
+                    //double[] rpms = new double[6];
+                    //Movement_handle.Current_rpm(rpms);
+                    //double[] torqueValues = new double[6];
+                    //Movement_handle.Motor_torque(torqueValues);
                 }
                 else
                 {

@@ -39,7 +39,7 @@ namespace hiwin_online_control_01
         public static unsafe void OPENconnect()
         {
             Callbackfunc = new HRobot.CallBackFun(Test);
-            Robot_ID = HRobot.open_connection("192.168.1.102", 1, Callbackfunc);  // robot ip 
+            Robot_ID = HRobot.open_connection("192.168.1.101", 1, Callbackfunc);  // robot ip 
             HRobot.set_operation_mode(Robot_ID, 1);
             Console.WriteLine("回傳結果" + Robot_ID);
         }
@@ -47,6 +47,7 @@ namespace hiwin_online_control_01
         {
             HRobot.motion_abort(Robot_ID);
             HRobot.disconnect(Robot_ID);
+            // HRobot.clear_alarm(Robot_ID);  // 試
         }
 
         public static void Speed(int PTP_v, double LIN_v)
@@ -59,9 +60,9 @@ namespace hiwin_online_control_01
             HRobot.set_override_ratio(Robot_ID, v); // 整體速度
         }
        
-        public static void Current_pos(double[] coor)
+        public static void Current_joint(double[] coor) 
         {
-            HRobot.get_current_position(Robot_ID, coor);
+            HRobot.get_current_joint(Robot_ID, coor);
         }
 
         public static void Get_timer()
@@ -69,26 +70,36 @@ namespace hiwin_online_control_01
             HRobot.get_timer(Robot_ID, 1);
         }
 
+        public static void Current_rpm(double[] coor) // 馬達轉速
+        {
+            HRobot.get_current_rpm(Robot_ID, coor);
+        }
+
+        public static void Motor_torque(double[] cur)
+        {
+            HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力百分比
+        }
+
         unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len) //alarm msg
         {
             switch(cmd)
             {
                 case 0:
-                    if(rlt==4030)
+                    if(rlt == 4030)
                     {
                         Console.WriteLine("HRSS_ALARM_NOTIFY");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
                     }
-                    else if(rlt==4031)
+                    else if(rlt == 4031)
                     {
                         Console.WriteLine("HRSS_BATTERY_WARNING");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
                     }
-                    else if(rlt==4032)
+                    else if(rlt == 4032)
                     {
                         Console.WriteLine("HRSS_BATTERY_ALARM");
                         Console.WriteLine(rlt);
@@ -111,12 +122,14 @@ namespace hiwin_online_control_01
                     }
                     else if (rlt == 4702)
                     {
+                        Console.WriteLine("以下資訊改變");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
                     }
                     else if (rlt == 4716)
                     {
+                        Console.WriteLine("HRSS傳給SDK");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
@@ -208,6 +221,12 @@ namespace hiwin_online_control_01
                         default:
                             break;
                     }
+                    break;
+                case 4151:
+                    Console.WriteLine("手臂資訊");
+                    Console.WriteLine(rlt);
+                    Console.WriteLine(cmd);
+                    Console.WriteLine(*msg);
                     break;
                 case 4202:
                     switch (rlt)
