@@ -12,13 +12,13 @@ public static class DotEnv
 {
     public static void Load(string filePath)
     {
-        if (!File.Exists(filePath))
+        if (!System.IO.File.Exists(filePath))
             return;
 
-        foreach (var line in File.ReadAllLines(filePath))
+        foreach (var line in System.IO.File.ReadAllLines(filePath))
         {
             var parts = line.Split(
-                '=',
+                new char[] { '=' },
                 StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
@@ -57,14 +57,16 @@ public class RobotControl : MonoBehaviour
 
     void Start()
     {
-        var root = Directory.GetCurrentDirectory();
-        var dotenv = Path.Combine(root, ".env");
+        var root = System.IO.Directory.GetCurrentDirectory();
+        var dotenv = System.IO.Path.Combine(root, ".env");
         DotEnv.Load(dotenv);
 
         receiveHost = Environment.GetEnvironmentVariable("UDP_IP");
         sendHost = Environment.GetEnvironmentVariable("UDP_IP");
-        receivePort = Environment.GetEnvironmentVariable("UDP_RECEIVE_PORT");
-        sendPort = Environment.GetEnvironmentVariable("UDP_SEND_PORT");
+        var receivePortVar = Environment.GetEnvironmentVariable("UDP_RECEIVE_PORT");
+        int.TryParse(receivePortVar, out receivePort);
+        var sendPortVar = Environment.GetEnvironmentVariable("UDP_SEND_PORT");
+        int.TryParse(sendPortVar, out sendPort);
 
         server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         server.Bind(new IPEndPoint(IPAddress.Parse(receiveHost), receivePort));
