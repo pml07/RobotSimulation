@@ -55,14 +55,25 @@ namespace hiwin_online_control_01
             HRobot.set_ptp_speed(Robot_ID, PTP_v);
             HRobot.set_lin_speed(Robot_ID, LIN_v);
         }
+        
+        public static void GetOVEspeed()
+        {
+            HRobot.get_override_ratio(Robot_ID); // 取整體速度
+        }
+
         public static void OVSpeed(int v)
         {
-            HRobot.set_override_ratio(Robot_ID, v); // 整體速度
+            HRobot.set_override_ratio(Robot_ID, v); // 設定整體速度
         }
        
-        public static void Current_joint(double[] coor) 
+        public static void Current_Angles(double[] coor) 
         {
-            HRobot.get_current_joint(Robot_ID, coor);
+            HRobot.get_current_joint(Robot_ID, coor); // degree
+        }
+
+        public static void Current_Pos(double[] coor)
+        {
+            HRobot.get_current_position(Robot_ID, coor); // mm
         }
 
         public static void Get_timer()
@@ -77,7 +88,7 @@ namespace hiwin_online_control_01
 
         public static void Motor_torque(double[] cur)
         {
-            HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力百分比
+            HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力
         }
 
         unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len) //alarm msg

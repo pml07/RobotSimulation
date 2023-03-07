@@ -3,14 +3,21 @@ import mediapipe as mp
 import socket
 import numpy as np
 import math
-import json
 import time
 
 
 ### socket
 UDP_IP = '127.0.0.1'
-UDP_PORT = 5065
-socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+UDP_SEND_PORT = 5065
+UDP_RECEIVE_PORT = 5066
+
+send_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+receive_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+receive_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+receive_socket.bind((UDP_IP, UDP_RECEIVE_PORT))
+
 
 angle1, a1_last, a1_f = 0, 0, 0
 angle2, a2_last, a2_f = 0, 0, 0
@@ -228,9 +235,14 @@ while True:
     send_ = str(a1_f)+';'+str(a2_f)+';'+str(a3_f)+';'+str(a4_f)+';'+str(a5_f)+';'+str(a6_f)
     # print(send_)
     if send_switch > 0:
-      socket.sendto((str(send_)).encode(),(UDP_IP,UDP_PORT))
-      
-    time.sleep(0.01)
+      send_socket.sendto((str(send_)).encode(), (UDP_IP,UDP_SEND_PORT))
+
+      message, address = receive_socket.recvfrom(1024)
+      msg = message.decode().split(";")
+      jRot = [msg[0], msg[1], msg[2], msg[3], msg[4], msg[5]]
+      jPos = [msg[6], msg[7], msg[8], msg[9], msg[10], msg[11]]
+      rpm = [msg[12], msg[13], msg[14], msg[15], msg[16], msg[17]]
+      torque = [msg[18], msg[19], msg[20], msg[21], msg[22], msg[23]]
 
   out.write(img)
   cv2.imshow('Robot Arm', img)
