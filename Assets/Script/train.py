@@ -12,13 +12,13 @@ import socket
 import matplotlib.pyplot as plt
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-dataset = 'random'  # test 1 / 2
+dataset = 'pos'
 train_dir = 'train'
-train_ca = '0'  # 10: -5~5 / 12
+train_ca = '12'  # 10: -5~5 / 12
 test_dir = 'test'
-test_ca = '1'  # 11: -5~5 / 13
+test_ca = '13'  # 11: -5~5 / 13
 batch_size = 1
-save_path = os.path.join("ckpt", f"{dataset}_{train_dir}_{train_ca}")
+save_path = os.path.join("ckpt", f"new_{dataset}_{train_dir}_{train_ca}")
 epochs = 50
 lr = 0.00001 # 0.00001
 best_loss = 1000
@@ -77,7 +77,7 @@ def load_model():
 def train(model, train_, test_):
     best_loss = 1000
     optimizer = Adam(model.parameters(), lr=lr)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
+    # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
     lossList = []
     model_path = f"{save_path}"
     if not os.path.isdir(model_path):
@@ -107,7 +107,7 @@ def train(model, train_, test_):
             #     print(name, 'gradient is', p.grad)
         
         train_loss = sum(train_lossList) / len(train_lossList)
-        scheduler.step()
+        # scheduler.step()
 
         # test
         test_lossList = []
@@ -119,7 +119,7 @@ def train(model, train_, test_):
                 output = model(x)
                 send(output)
                 r_pos = receive()
-                loss_ = loss.loss_(y, output) # output
+                loss_ = loss.total_loss(y, output) # output
                 test_lossList.append(loss_)
             test_loss = sum(test_lossList) / len(test_lossList)
                 
