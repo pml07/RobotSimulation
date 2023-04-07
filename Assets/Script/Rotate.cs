@@ -32,15 +32,38 @@ public class Rotate : MonoBehaviour
 
     void Update()
     {
-        jointRotations[0] = UnityEngine.Random.Range(-165, 165);  // -165~165
-        jointRotations[1] = UnityEngine.Random.Range(-125, 85);  // -125~85    
-        jointRotations[2] = UnityEngine.Random.Range(-55, 185);  // -55~185
-        jointRotations[3] = UnityEngine.Random.Range(-190, 190);  // -190~190
-        jointRotations[4] = UnityEngine.Random.Range(-115, 115);  // -115~115
-        jointRotations[1] = UnityEngine.Random.Range(-5, 5);  // --360~360
+        float prev0Rotation = jointRotations[0];
+        float new0Rotation = Mathf.Clamp(Random.Range(prev0Rotation - 3f, prev0Rotation + 3f), -165f, 165f);  // -165~165
+        jointRotations[0] = new0Rotation;
+        prev0Rotation = new0Rotation;
+    
+        float prev1Rotation = jointRotations[1];
+        float new1Rotation = Mathf.Clamp(Random.Range(prev1Rotation - 3f, prev1Rotation + 3f), -125f, 85f);  // -125~85
+        jointRotations[1] = new1Rotation;
+        prev1Rotation = new1Rotation;
+
+        float prev2Rotation = jointRotations[2];
+        float new2Rotation = Mathf.Clamp(Random.Range(prev2Rotation - 3f, prev2Rotation + 3f), -55f, 185f);  // -55~185
+        jointRotations[2] = new2Rotation;
+        prev2Rotation = new2Rotation;
+
+        float prev3Rotation = jointRotations[3];
+        float new3Rotation = Mathf.Clamp(Random.Range(prev3Rotation - 3f, prev3Rotation + 3f), -190f, 190f);  // -190~190
+        jointRotations[3] = new3Rotation;
+        prev3Rotation = new3Rotation;
+
+        float prev4Rotation = jointRotations[4];
+        float new4Rotation = Mathf.Clamp(Random.Range(prev4Rotation - 3f, prev4Rotation + 3f), -115f, 115f);  // -115~115
+        jointRotations[4] = new4Rotation;
+        prev4Rotation = new4Rotation;
+
+        float prev5Rotation = jointRotations[5];
+        float new5Rotation = Mathf.Clamp(Random.Range(prev5Rotation - 1f, prev5Rotation + 1f), -2f, 2f);  // -360~360
+        jointRotations[5] = new5Rotation;
+        prev5Rotation = new5Rotation;
 
         upperbaseJoint.localRotation = Quaternion.Euler(0, jointRotations[0], 0);  // 0 a1 0
-        shoulderJoint.localRotation = Quaternion.Euler(jointRotations[1], 0, 0);  // a2 0 0
+        torsoJoint.localRotation = Quaternion.Euler(jointRotations[1], 0, 0);  // a2 0 0
         armJoint.localRotation = Quaternion.Euler(jointRotations[2], 0, 0);  // a3 0 0
         forearmJoint.localRotation = Quaternion.Euler(0, jointRotations[3], 0);  // 0 a4 0
         wristJoint.localRotation = Quaternion.Euler(jointRotations[4], 0, 0);  // a5 0 0
@@ -53,15 +76,12 @@ public class Rotate : MonoBehaviour
     }
 
     void jPosition()
-    {
-        baseJoint = GameObject.Find("base_link").transform;
-        torsoJoint = GameObject.Find("base_link/upperbase_link/torso_link").transform;
-
+    {        
         axisPositions[0] = baseJoint.transform.position - baseJoint.transform.position;  // axis 1 端點: base_link
-        axisPositions[1] = torsoJoint.transform.position - baseJoint.transform.position;  // axis 2 端點: torso_link
-        axisPositions[2] = shoulderJoint.transform.position - baseJoint.transform.position;  // axis 3 端點: shoulder_link
-        axisPositions[3] = armJoint.transform.position - baseJoint.transform.position;  // axis 4 端點: arm_link
-        axisPositions[4] = forearmJoint.transform.position - baseJoint.transform.position;  // axis 5 端點: forearm_link
+        axisPositions[1] = shoulderJoint.transform.position - baseJoint.transform.position;  // axis 2 端點: shoulder_link
+        axisPositions[2] = armJoint.transform.position - baseJoint.transform.position;  // axis 3 端點: arm_link
+        axisPositions[3] = forearmJoint.transform.position - baseJoint.transform.position;  // axis 4 端點: forearm_link
+        axisPositions[4] = handJoint.transform.position - baseJoint.transform.position;  // axis 5 端點: hand_link
         axisPositions[5] = wristJoint.transform.position - baseJoint.transform.position;  // axis 6 端點: wrist_link
         Debug.Log(axisPositions[0] + "," + axisPositions[1] + "," + axisPositions[2] + "," + axisPositions[3] + "," + axisPositions[4] + "," + axisPositions[5]);
     }
