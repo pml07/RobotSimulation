@@ -12,32 +12,32 @@ import socket
 import matplotlib.pyplot as plt
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-dataset = 'pos'
+dataset = 'data'
 train_dir = 'train'
-train_ca = '12'  # 10: -5~5 / 12
+train_ca = '01'
 test_dir = 'test'
-test_ca = '13'  # 11: -5~5 / 13
+test_ca = '02'
 batch_size = 1
-save_path = os.path.join("ckpt", f"new_{dataset}_{train_dir}_{train_ca}")
-epochs = 50
-lr = 0.00001 # 0.00001
+save_path = os.path.join("ckpt", f"{dataset}_{train_dir}_{train_ca}")
+epochs = 250
+lr = 0.0001 # 0.00001
 best_loss = 1000
 
 
-def send(output):
-    rot_values = output.tolist()[0]
-    send_msg = ','.join(str(f) for f in rot_values)
-    # print("------send: ", send_msg)
-    s_socket.sendall(send_msg.encode())
+# def send(output):
+#     rot_values = output.tolist()[0]
+#     send_msg = ','.join(str(f) for f in rot_values)
+#     # print("------send: ", send_msg)
+#     s_socket.sendall(send_msg.encode())
     
-def receive():
-    message = s_socket.recv(1024)
-    message = message.decode('utf-8')  # string
-    msg = [float(val) for tpl in message.split(";") for val in tpl.strip("()").split(",")] # list[float]
-    # print(msg)
-    r_pos = torch.tensor([msg], requires_grad=True)
-    # print('r_pos: ', r_pos)
-    return r_pos
+# def receive():
+#     message = s_socket.recv(1024)
+#     message = message.decode('utf-8')  # string
+#     msg = [float(val) for tpl in message.split(";") for val in tpl.strip("()").split(",")] # list[float]
+#     # print(msg)
+#     r_pos = torch.tensor([msg], requires_grad=True)
+#     # print('r_pos: ', r_pos)
+#     return r_pos
 
 
 def save_result(save_path, result):
@@ -68,13 +68,13 @@ def load_data():
     return train_, test_, train_sampler, test_sampler
 
 def load_model():
-    model = lstm.LSTM(input_size=18, hidden_size=32, output_size=6, num_layers=1).to(DEVICE)
+    model = lstm.LSTM(input_size=18, hidden_size1=32, output_size=6, num_layers=1, dropout=0.2).to(DEVICE)
     model = model.to(DEVICE)
     print('------model: ',model)
     return model
 
 
-def train(model, train_, test_):
+def train(model, train_, test_, early_stop_patience=10):
     best_loss = 1000
     optimizer = Adam(model.parameters(), lr=lr)
     # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
@@ -83,6 +83,7 @@ def train(model, train_, test_):
     if not os.path.isdir(model_path):
         os.mkdir(model_path)
     
+    no_improvement = 0
     # training
     for epoch in range(epochs):
         # train
@@ -95,11 +96,12 @@ def train(model, train_, test_):
             output = model(x)
             # print('---------------y: ', y)
             # print('---------------output: ', output)
-            send(output)
-            r_pos = receive()
-            
+            # send(output)
+            # r_pos = receive()
             # print('-----------------r_pos: ', r_pos)
-            loss_ = loss.total_loss(y, output) # output
+            
+            # loss_ = loss.total_loss(y, output)  # degree
+            loss_ = loss.calculate_distance(x, output)  # distance
             train_lossList.append(loss_)
             loss_.backward()
             optimizer.step()
@@ -117,9 +119,11 @@ def train(model, train_, test_):
                 x = x.to(DEVICE)
                 y = y.to(DEVICE)
                 output = model(x)
-                send(output)
-                r_pos = receive()
-                loss_ = loss.total_loss(y, output) # output
+                # send(output)
+                # r_pos = receive()
+                
+                # loss_ = loss.total_loss(y, output) # degree
+                loss_ = loss.calculate_distance(x, output)  # distance
                 test_lossList.append(loss_)
             test_loss = sum(test_lossList) / len(test_lossList)
                 
@@ -127,8 +131,16 @@ def train(model, train_, test_):
         if train_loss < best_loss:
             torch.save(model, model_path + "/best.pth")
             best_loss = train_loss
+            no_improvement = 0
         else:
+            no_improvement += 1
             torch.save(model, model_path + "/last.pth")
+        
+        # early stopping
+        if no_improvement >= early_stop_patience:
+            print(f"No improvement for {early_stop_patience} epochs. Early stopping.")
+            break
+        
         result = "Epoch = {:3}/{}, train_loss = {:8}, test_loss = {:8}".format(epoch+1, epochs, train_loss.item(), test_loss.item())
         lossList.append([train_loss.item(), test_loss.item()])
         print(result)
@@ -163,15 +175,15 @@ def plot():
      
 
 if __name__=='__main__':
-    TCP_IP = 'localhost'
-    TCP_PORT = 8080
+    # TCP_IP = 'localhost'
+    # TCP_PORT = 8080
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((TCP_IP, TCP_PORT))
-    s.listen()
-    s_socket, addr = s.accept()
-    print("connected to client")
+    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # s.bind((TCP_IP, TCP_PORT))
+    # s.listen()
+    # s_socket, addr = s.accept()
+    # print("connected to client")
 
     # save log
     if not os.path.isdir(save_path):
@@ -180,12 +192,12 @@ if __name__=='__main__':
                 "lr":lr, "batch_size":batch_size, "epochs":epochs}
         with open(save_path + '/opt.json', 'w') as fp:
             json.dump(opt, fp)
-    try:
-        train
-        model = load_model()
-        train_, test_, train_sampler, test_sampler = load_data()
-        train(model, train_, test_)
+    # try:
+    # train
+    model = load_model()
+    train_, test_, train_sampler, test_sampler = load_data()
+    train(model, train_, test_)
+    plot()
 
-        plot()
-    except(KeyboardInterrupt):
-        s.close()
+    # except(KeyboardInterrupt):
+    #     s.close()
