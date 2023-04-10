@@ -4,12 +4,34 @@ import socket
 import numpy as np
 import math
 import time
+import os
+from apis.api import login, device_add, device_get
+from dotenv import load_dotenv
 
-
+load_dotenv('.env')
 ### socket
-UDP_IP = '127.0.0.1'
-UDP_SEND_PORT = 5065
-UDP_RECEIVE_PORT = 5066
+UDP_IP = os.getenv('UDP_IP','127.0.0.1')
+UDP_SEND_PORT = int(os.getenv('UDP_SEND_PORT',5065))
+UDP_RECEIVE_PORT = int(os.getenv('UDP_RECEIVE_PORT',5066))
+DEVICE_ID = os.getenv('DEVICE_ID', None)
+
+user_data = {
+  "email": os.getenv('USER_EMAIL', 'user'),
+  "password": os.getenv('USER_PASSWORD', 'user')
+}
+
+device_data = {
+  "name": os.getenv('DEVICE_NAME','device_from_robotSim')
+}
+
+token=login(user_data)
+print(token)
+
+if DEVICE_ID is None:
+  DEVICE_ID=device_add(device_data,token)
+  envFile = open(".env", "a")
+  print(DEVICE_ID)
+  envFile.writelines('DEVICE_ID='+str(DEVICE_ID))
 
 send_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -46,7 +68,7 @@ def angle(v1, v2):
 
 
 ### mediapipe
-cap = cv2.VideoCapture(2, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 mpPose = mp.solutions.pose
 pose = mpPose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5, static_image_mode=False, model_complexity=1)
 
@@ -231,6 +253,9 @@ while True:
         a6_f = angle6
         send_switch +=1
       a6_last = angle6
+
+    response = device_get(DEVICE_ID, token)
+    print(response['joint_list'])
 
     send_ = str(a1_f)+';'+str(a2_f)+';'+str(a3_f)+';'+str(a4_f)+';'+str(a5_f)+';'+str(a6_f)
     # print(send_)
