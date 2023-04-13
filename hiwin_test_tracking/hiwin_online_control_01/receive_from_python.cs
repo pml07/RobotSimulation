@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
 using SDKHrobot;
+using System.IO;
 
 namespace hiwin_online_control_01
 {
@@ -25,8 +26,14 @@ namespace hiwin_online_control_01
             Movement_handle.Speed(30, 1000);
             Movement_handle.SetAcc(0.001);
 
+            var root = Directory.GetCurrentDirectory();
+            var dotenv = Path.Combine(root, ".env");
+            DotEnv.Load(dotenv);
+            
+            var server_ip = Environment.GetEnvironmentVariable("HOST_IP");
+            var server_port = Environment.GetEnvironmentVariable("HOST_PORT");
             server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            server.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5065));
+            server.Bind(new IPEndPoint(IPAddress.Parse(server_ip), Int32.Parse(server_port)));
             Console.WriteLine("------------- Robot Arm Connected -------------");
 
             client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);

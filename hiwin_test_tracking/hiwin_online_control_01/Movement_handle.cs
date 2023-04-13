@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using SDKHrobot;
 
 namespace hiwin_online_control_01
@@ -42,8 +41,13 @@ namespace hiwin_online_control_01
 
         public static unsafe void OPENconnect()
         {
+            var root = Directory.GetCurrentDirectory();
+            var dotenv = Path.Combine(root, ".env");
+            DotEnv.Load(dotenv);
+
+            var robot_ip = Environment.GetEnvironmentVariable("DEVICE_IP");
             Callbackfunc = new HRobot.CallBackFun(Test);
-            Robot_ID = HRobot.open_connection("192.168.1.106", 1, Callbackfunc);  // robot ip 
+            Robot_ID = HRobot.open_connection(robot_ip, 1, Callbackfunc);  // robot ip 
             HRobot.set_operation_mode(Robot_ID, 1);
             Console.WriteLine("回傳結果" + Robot_ID);
         }
