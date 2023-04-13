@@ -6,22 +6,21 @@ using SDKHrobot;
 namespace hiwin_online_control_01
 {
     class Movement_handle
-    { 
+    {
         static int Robot_ID;
         static HRobot.CallBackFun Callbackfunc;
 
         unsafe static void Main(string[] args)
         {
             Console.WriteLine("Done!!");
-            while (true) 
+            while (true)
             {
-                if(Console.KeyAvailable)
+                if (Console.KeyAvailable)
                 {
                     HRobot.disconnect(Robot_ID);
                 }
             }
         }
-
 
         public static void RunPTP(double[] targetPOS)
         {
@@ -36,10 +35,15 @@ namespace hiwin_online_control_01
             HRobot.ptp_axis(Robot_ID, 1, targetPOS);  // 6axis
         }
 
+        public static void SetAcc(double value)
+        {
+            HRobot.set_acc_time(Robot_ID, value);  // 加速度時間
+        }
+
         public static unsafe void OPENconnect()
         {
             Callbackfunc = new HRobot.CallBackFun(Test);
-            Robot_ID = HRobot.open_connection("192.168.1.101", 1, Callbackfunc);  // robot ip 
+            Robot_ID = HRobot.open_connection("192.168.1.106", 1, Callbackfunc);  // robot ip 
             HRobot.set_operation_mode(Robot_ID, 1);
             Console.WriteLine("回傳結果" + Robot_ID);
         }
@@ -47,7 +51,6 @@ namespace hiwin_online_control_01
         {
             HRobot.motion_abort(Robot_ID);
             HRobot.disconnect(Robot_ID);
-            // HRobot.clear_alarm(Robot_ID);  // 試
         }
 
         public static void Speed(int PTP_v, double LIN_v)
@@ -55,7 +58,7 @@ namespace hiwin_online_control_01
             HRobot.set_ptp_speed(Robot_ID, PTP_v);
             HRobot.set_lin_speed(Robot_ID, LIN_v);
         }
-        
+
         public static void GetOVEspeed()
         {
             HRobot.get_override_ratio(Robot_ID); // 取整體速度
@@ -65,8 +68,8 @@ namespace hiwin_online_control_01
         {
             HRobot.set_override_ratio(Robot_ID, v); // 設定整體速度
         }
-       
-        public static void Current_Angles(double[] coor) 
+
+        public static void Current_Angles(double[] coor)
         {
             HRobot.get_current_joint(Robot_ID, coor); // degree
         }
@@ -91,26 +94,26 @@ namespace hiwin_online_control_01
             HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力
         }
 
-        unsafe static void Test(ushort cmd ,ushort rlt, char* msg, int len) //alarm msg
+        unsafe static void Test(ushort cmd, ushort rlt, char* msg, int len) //alarm msg
         {
-            switch(cmd)
+            switch (cmd)
             {
                 case 0:
-                    if(rlt == 4030)
+                    if (rlt == 4030)
                     {
                         Console.WriteLine("HRSS_ALARM_NOTIFY");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
                     }
-                    else if(rlt == 4031)
+                    else if (rlt == 4031)
                     {
                         Console.WriteLine("HRSS_BATTERY_WARNING");
                         Console.WriteLine(rlt);
                         Console.WriteLine(cmd);
                         Console.WriteLine(*msg);
                     }
-                    else if(rlt == 4032)
+                    else if (rlt == 4032)
                     {
                         Console.WriteLine("HRSS_BATTERY_ALARM");
                         Console.WriteLine(rlt);
@@ -153,7 +156,7 @@ namespace hiwin_online_control_01
                     Console.WriteLine(*msg);
                     break;
                 case 1450:
-                    switch(rlt)
+                    switch (rlt)
                     {
                         case 4028:
                             Console.WriteLine("HRSS_START_CLEAR_ALARM");
@@ -172,7 +175,7 @@ namespace hiwin_online_control_01
                     }
                     break;
                 case 4001:
-                    switch(rlt)
+                    switch (rlt)
                     {
                         case 4011:
                             Console.WriteLine("ERROR_OPEN_FILE");
@@ -191,7 +194,7 @@ namespace hiwin_online_control_01
                     }
                     break;
                 case 4011:
-                    switch(rlt)
+                    switch (rlt)
                     {
                         case 4020:
                             Console.WriteLine("HRSS_UPDATE_FILE_ERROR");
