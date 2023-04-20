@@ -80,9 +80,11 @@ def receive_socket_thread_function():
 while True:
   try:
     response = device_get(DEVICE_ID, token)
-    response_joint_list = response['joint_list']
-    response_angle = json.loads(response_joint_list)['angle']
-    isAnyAngleChanged = compare2angleList(response_angle, current_angle)
+    isAnyAngleChanged = False
+    if 'joint_list' in response:
+      response_joint_list = response['joint_list']
+      response_angle = json.loads(response_joint_list)['angle']
+      isAnyAngleChanged = compare2angleList(response_angle, current_angle)
 
     send_ = str(response_angle[0])+';'+str(response_angle[1])+';'+str(response_angle[2])+';'+str(response_angle[3])+';'+str(response_angle[4])+';'+str(response_angle[5])
     print(send_)
