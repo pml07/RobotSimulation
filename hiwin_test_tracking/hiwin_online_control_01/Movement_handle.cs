@@ -43,7 +43,7 @@ namespace hiwin_online_control_01
         public static unsafe void OPENconnect()
         {
             Callbackfunc = new HRobot.CallBackFun(Test);
-            Robot_ID = HRobot.open_connection("192.168.1.106", 1, Callbackfunc);  // robot ip 
+            Robot_ID = HRobot.open_connection("192.168.1.105", 1, Callbackfunc);  // robot ip 
             HRobot.set_operation_mode(Robot_ID, 1);
             Console.WriteLine("回傳結果" + Robot_ID);
         }
@@ -93,6 +93,11 @@ namespace hiwin_online_control_01
         {
             HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力
         }
+
+        //public static void Clear_alarm()
+        //{
+            //HRobot.clear_alarm(Robot_ID);
+        //}
 
         unsafe static void Test(ushort cmd, ushort rlt, char* msg, int len) //alarm msg
         {
