@@ -3,6 +3,7 @@ import numpy as np
 import math
 import os
 import json
+import time
 import threading
 import sys
 from apis.api import login, device_add, device_get
@@ -97,6 +98,8 @@ while True:
         receive_socket_thread = threading.Thread(target=receive_socket_thread_function)
         receive_socket_thread.daemon = True 
         receive_socket_thread.start()
+      
+      time.sleep(3)
       
   except (KeyboardInterrupt, SystemExit):
     sys.exit()
