@@ -86,17 +86,17 @@ while True:
       response_angle = json.loads(response_joint_list)['angle']
       isAnyAngleChanged = compare2angleList(response_angle, current_angle)
 
-    send_ = str(response_angle[0])+';'+str(response_angle[1])+';'+str(response_angle[2])+';'+str(response_angle[3])+';'+str(response_angle[4])+';'+str(response_angle[5])
-    print(send_)
+      send_ = str(response_angle[0])+';'+str(response_angle[1])+';'+str(response_angle[2])+';'+str(response_angle[3])+';'+str(response_angle[4])+';'+str(response_angle[5])
+      print(send_)
 
-    current_angle = response_angle
+      current_angle = response_angle
 
-    if isAnyAngleChanged:
-      send_socket.sendto((str(send_)).encode(), (UDP_IP,UDP_SEND_PORT))
-      print("thread created!")
-      receive_socket_thread = threading.Thread(target=receive_socket_thread_function)
-      receive_socket_thread.daemon = True 
-      receive_socket_thread.start()
+      if isAnyAngleChanged:
+        send_socket.sendto((str(send_)).encode(), (UDP_IP,UDP_SEND_PORT))
+        print("thread created!")
+        receive_socket_thread = threading.Thread(target=receive_socket_thread_function)
+        receive_socket_thread.daemon = True 
+        receive_socket_thread.start()
       
   except (KeyboardInterrupt, SystemExit):
     sys.exit()

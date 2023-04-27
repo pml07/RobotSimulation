@@ -15,7 +15,7 @@ def device_add(data, token):
   return r.json()['id']
 
 def device_get(id, token):
-  url = BASE_URL + 'device/?id='+str(id)
+  url = BASE_URL + 'device/'+str(id)
   r = requests.get(url, headers={"Content-Type":"application/json", "Authorization": f"Bearer {token}"})
 
   return r.json()
