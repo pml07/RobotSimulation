@@ -84,7 +84,7 @@ while True:
     isAnyAngleChanged = False
     if 'joint_list' in response:
       response_joint_list = response['joint_list']
-      response_angle = json.loads(response_joint_list)['angle']
+      response_angle = json.loads(response_joint_list.replace("'", "\""))['angle']
       isAnyAngleChanged = compare2angleList(response_angle, current_angle)
 
       send_ = str(response_angle[0])+';'+str(response_angle[1])+';'+str(response_angle[2])+';'+str(response_angle[3])+';'+str(response_angle[4])+';'+str(response_angle[5])
