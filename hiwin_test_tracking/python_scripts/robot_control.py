@@ -99,7 +99,7 @@ while True:
         receive_socket_thread.daemon = True 
         receive_socket_thread.start()
       
-      time.sleep(3)
+      time.sleep(1)
       
   except (KeyboardInterrupt, SystemExit):
     sys.exit()
