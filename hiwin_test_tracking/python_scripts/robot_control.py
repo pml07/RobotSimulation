@@ -1,19 +1,17 @@
-import socket
 import numpy as np
 import math
 import os
 import json
-import time
-import threading
 import sys
+import asyncio
+import websockets
 from apis.api import login, device_add, device_get
 from dotenv import load_dotenv
 
 load_dotenv('.env')
-### socket
-UDP_IP = os.getenv('UDP_IP','127.0.0.1')
-UDP_SEND_PORT = int(os.getenv('UDP_SEND_PORT',5065))
-UDP_RECEIVE_PORT = int(os.getenv('UDP_RECEIVE_PORT',5066))
+### websocket
+HOST_IP = os.getenv('HOST_IP','127.0.0.1')
+HOST_PORT = int(os.getenv('HOST_PORT',5065))
 DEVICE_ID = os.getenv('DEVICE_ID', None)
 
 user_data = {
@@ -33,13 +31,6 @@ if DEVICE_ID is None:
   envFile = open(".env", "a")
   print(DEVICE_ID)
   envFile.writelines('DEVICE_ID='+str(DEVICE_ID))
-
-send_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-receive_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-receive_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-receive_socket.bind((UDP_IP, UDP_RECEIVE_PORT))
 
 current_angle = []
 ### angle
@@ -68,38 +59,58 @@ def compare2angleList(angle1, angle2):
       return True
   return False
 
-def receive_socket_thread_function():
-    message, address = receive_socket.recvfrom(1024)
-    msg = message.decode().split(";")
-    jRot = [msg[0], msg[1], msg[2], msg[3], msg[4], msg[5]]
-    jPos = [msg[6], msg[7], msg[8], msg[9], msg[10], msg[11]]
-    rpm = [msg[12], msg[13], msg[14], msg[15], msg[16], msg[17]]
-    torque = [msg[18], msg[19], msg[20], msg[21], msg[22], msg[23]]
-    print(jRot, jPos, rpm, torque)
-    print(address)
+async def ws_echo_function(websocket):
+    while True:
+      await ws_send(websocket)
+      print("ws_sent")
+      try:
+          await ws_recv(websocket)
+      except websockets.ConnectionClosedOK:
+          print("websockets ConnectionClosedOK error")
+          break
 
-while True:
+async def ws_send(websocket):
   try:
     response = device_get(DEVICE_ID, token)
     isAnyAngleChanged = False
     if 'joint_list' in response:
       response_joint_list = response['joint_list']
       response_angle = json.loads(response_joint_list.replace("'", "\""))['angle']
+      global current_angle
       isAnyAngleChanged = compare2angleList(response_angle, current_angle)
 
-      send_ = str(response_angle[0])+';'+str(response_angle[1])+';'+str(response_angle[2])+';'+str(response_angle[3])+';'+str(response_angle[4])+';'+str(response_angle[5])
+      send_ = ';'.join(str(angle) for angle in response_angle)
       print(send_)
 
       current_angle = response_angle
 
       if isAnyAngleChanged:
-        send_socket.sendto((str(send_)).encode(), (UDP_IP,UDP_SEND_PORT))
-        print("thread created!")
-        receive_socket_thread = threading.Thread(target=receive_socket_thread_function)
-        receive_socket_thread.daemon = True 
-        receive_socket_thread.start()
-      
-      time.sleep(1)
-      
+        try:
+          await websocket.send(str(send_))
+        except websockets.ConnectionClosedOK:
+          print("websockets ConnectionClosedOK error")
+        await asyncio.sleep(0.1)
+
   except (KeyboardInterrupt, SystemExit):
     sys.exit()
+
+async def ws_recv(websocket):
+    try:
+        message = await asyncio.wait_for(websocket.recv(), timeout=0.1)
+        print("reveive data:" + message)
+        msg = message.split(";")
+        jRot = msg[:6]
+        jPos = msg[6:12]
+        rpm = msg[12:18]
+        torque = msg[18:24]
+        print(jRot, jPos, rpm, torque)
+    except asyncio.TimeoutError:
+        print("No Data reveived")
+    await asyncio.sleep(0.1)
+
+async def ws_main():
+    print("ws_main")
+    async with websockets.serve(ws_echo_function, HOST_IP, HOST_PORT):
+      await asyncio.Future() 
+
+asyncio.run(ws_main())
