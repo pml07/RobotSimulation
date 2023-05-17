@@ -67,7 +67,7 @@ async def ws_echo_function(websocket):
           await ws_recv(websocket)
       except websockets.ConnectionClosedOK:
           print("websockets ConnectionClosedOK error")
-          break
+          pass
 
 async def ws_send(websocket):
   try:
