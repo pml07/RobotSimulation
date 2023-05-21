@@ -5,7 +5,7 @@ import json
 import sys
 import asyncio
 import websockets
-from apis.api import login, device_add, device_get
+from apis.api import login, device_add, device_get, device_patch
 from dotenv import load_dotenv
 
 load_dotenv('.env')
@@ -62,7 +62,6 @@ def compare2angleList(angle1, angle2):
 async def ws_echo_function(websocket):
     while True:
       await ws_send(websocket)
-      print("ws_sent")
       try:
           await ws_recv(websocket)
       except websockets.ConnectionClosedOK:
@@ -72,24 +71,32 @@ async def ws_echo_function(websocket):
 async def ws_send(websocket):
   try:
     response = device_get(DEVICE_ID, token)
-    isAnyAngleChanged = False
-    if 'joint_list' in response:
+    isActionChanged = False
+    action_type = 'move' 
+    if 'action' in response:
+      action_type = response['action']
+
+    if action_type == 'move' and 'joint_list' in response:
       response_joint_list = response['joint_list']
       response_angle = json.loads(response_joint_list.replace("'", "\""))['angle']
       global current_angle
-      isAnyAngleChanged = compare2angleList(response_angle, current_angle)
+      isActionChanged = compare2angleList(response_angle, current_angle)
 
       send_ = ';'.join(str(angle) for angle in response_angle)
       print(send_)
 
       current_angle = response_angle
+    elif action_type == 'clear_alarm':
+       print(action_type)
+       isActionChanged = True
 
-      if isAnyAngleChanged:
-        try:
-          await websocket.send(str(send_))
-        except websockets.ConnectionClosedOK:
-          print("websockets ConnectionClosedOK error")
-        await asyncio.sleep(0.1)
+    if isActionChanged:
+      try:
+        await websocket.send(str(send_))
+        print("ws_sent")
+      except websockets.ConnectionClosedOK:
+        print("websockets ConnectionClosedOK error")
+      await asyncio.sleep(0.1)
 
   except (KeyboardInterrupt, SystemExit):
     sys.exit()
@@ -98,12 +105,18 @@ async def ws_recv(websocket):
     try:
         message = await asyncio.wait_for(websocket.recv(), timeout=0.1)
         print("reveive data:" + message)
-        msg = message.split(";")
-        jRot = msg[:6]
-        jPos = msg[6:12]
-        rpm = msg[12:18]
-        torque = msg[18:24]
-        print(jRot, jPos, rpm, torque)
+        data = json.loads(message)
+        alarm_code = data.get("alarmCode", None)
+        if alarm_code != None:
+           print(alarm_code)
+           device_patch(DEVICE_ID, {"alarm_message": alarm_code}, token)
+
+        if "jointAngles" in data:
+          jRot = data["jointAngles"]
+          jPos = data["jointPos"]
+          rpm = data["rpms"]
+          torque = data["torqueValues"]
+          print(jRot, jPos, rpm, torque)
     except asyncio.TimeoutError:
         print("No Data reveived")
     await asyncio.sleep(0.1)

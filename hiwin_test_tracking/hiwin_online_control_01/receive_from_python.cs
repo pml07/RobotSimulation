@@ -2,7 +2,8 @@
 using System.Linq;
 using System.IO;
 using WebSocketSharp;
-
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 namespace hiwin_online_control_01
 {
     class Receive_from_python
@@ -44,6 +45,40 @@ namespace hiwin_online_control_01
         static void OnMessage(object? sender, MessageEventArgs e)
         {
             // TODO
+            int refCount = 0;
+            ulong[] alarmCode = new ulong[20];
+            Movement_handle.Get_alarm_code(ref refCount, alarmCode);
+            
+            string alarmValue = alarmCode.ToString();
+            Console.WriteLine(alarmValue);
+            if (alarmValue.Length == 16) 
+            {
+                string[] digits = Regex.Split(alarmValue, @"[0-9]{4}}");
+                Console.WriteLine(digits[0]);
+
+                if (digits[0] == "0000")
+                {
+                    Console.WriteLine("------------- Alarm Code is 0000 -------------");
+                }
+                else
+                {
+                    Console.WriteLine("------------- Alarm Code is not 0000 -------------");
+                    string alarm_code = digits[0];
+                    var data = new
+                    {
+                        alarm_code
+                    };
+
+                    string jsonData = JsonConvert.SerializeObject(data);
+                    ws.Send(jsonData);
+                    return;
+                }
+            }
+            else
+            {
+                Console.WriteLine("------------- Alarm Code is not 16 digits -------------");
+            }
+
             Console.WriteLine("------------- WebSocket OnMessage -------------");
             string message = e.Data.ToString();
             Console.WriteLine(message);
@@ -64,13 +99,21 @@ namespace hiwin_online_control_01
                 double[] torqueValues = new double[6];
                 Movement_handle.Motor_torque(torqueValues);
 
-                string rotMsg = string.Join(";", jointAngles.Select(r => r.ToString()).ToArray());
-                string posMsg = string.Join(";", jointPos.Select(p => p.ToString()).ToArray());
-                string rpmMsg = string.Join(";", rpms.Select(rp => rp.ToString()).ToArray());
-                string torMsg = string.Join(";", torqueValues.Select(t => t.ToString()).ToArray());
-                string send_message = $"{rotMsg};{posMsg};{rpmMsg};{torMsg}";
+                var data = new
+                {
+                    jointAngles,
+                    jointPos,
+                    rpms,
+                    torqueValues
+                };
 
-                ws.Send(send_message);
+                string jsonData = JsonConvert.SerializeObject(data);
+                ws.Send(jsonData);
+            }
+            else if(message == "clear_alarm")
+            {
+                Console.WriteLine("------------- Clear Alarm Message -------------");
+                Movement_handle.Clear_alarm();
             }
             else
             {

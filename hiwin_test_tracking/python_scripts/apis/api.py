@@ -20,6 +20,12 @@ def device_get(id, token):
 
   return r.json()
 
+def device_patch(id, data, token):
+  url = BASE_URL + 'device/'+str(id)+''
+  r = requests.patch(url, json = data, headers={"Content-Type":"application/json", "Authorization": f"Bearer {token}"})
+
+  return r.json()
+
 def device_action(id, data, token):
   url = BASE_URL + 'device/'+str(id)+'/action'
   r = requests.patch(url, json = data, headers={"Content-Type":"application/json", "Authorization": f"Bearer {token}"})

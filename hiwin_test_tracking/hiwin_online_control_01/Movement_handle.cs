@@ -98,10 +98,15 @@ namespace hiwin_online_control_01
             HRobot.get_motor_torque(Robot_ID, cur); // 馬達扭力
         }
 
-        //public static void Clear_alarm()
-        //{
-            //HRobot.clear_alarm(Robot_ID);
-        //}
+        public static void Get_alarm_code(ref int count, ulong[] alarm_code)
+        {
+            HRobot.get_alarm_code(Robot_ID, ref count, alarm_code); // get alarm msg
+        }
+
+        public static void Clear_alarm()
+        {
+            HRobot.clear_alarm(Robot_ID); // clear alarm msg
+        }
 
         unsafe static void Test(ushort cmd, ushort rlt, char* msg, int len) //alarm msg
         {
