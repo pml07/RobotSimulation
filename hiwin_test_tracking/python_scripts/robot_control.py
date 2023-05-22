@@ -88,6 +88,7 @@ async def ws_send(websocket):
       current_angle = response_angle
     elif action_type == 'clear_alarm':
        print(action_type)
+       send_ = 'clear_alarm'
        isActionChanged = True
 
     if isActionChanged:
@@ -106,10 +107,17 @@ async def ws_recv(websocket):
         message = await asyncio.wait_for(websocket.recv(), timeout=0.1)
         print("reveive data:" + message)
         data = json.loads(message)
-        alarm_code = data.get("alarmCode", None)
+        alarm_code = data.get("alarm_code", None)
         if alarm_code != None:
            print(alarm_code)
-           device_patch(DEVICE_ID, {"alarm_message": alarm_code}, token)
+           response = device_get(DEVICE_ID, token)
+           device_patch(DEVICE_ID, {
+              "name": response["name"],
+              "brand": response["brand"],
+              "ip": response["ip"],
+              "port": response["port"],
+              "alarm_message": alarm_code
+              }, token)
 
         if "jointAngles" in data:
           jRot = data["jointAngles"]

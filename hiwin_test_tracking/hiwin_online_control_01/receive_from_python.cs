@@ -49,34 +49,44 @@ namespace hiwin_online_control_01
             ulong[] alarmCode = new ulong[20];
             Movement_handle.Get_alarm_code(ref refCount, alarmCode);
             
-            string alarmValue = alarmCode.ToString();
+            string alarmValue = alarmCode[0].ToString();
             Console.WriteLine(alarmValue);
-            if (alarmValue.Length == 16) 
-            {
-                string[] digits = Regex.Split(alarmValue, @"[0-9]{4}}");
-                Console.WriteLine(digits[0]);
+            string[] digits = Regex.Split(alarmValue, "(?<=\\G.{4})");
+            Console.WriteLine(digits[0]);
 
-                if (digits[0] == "0000")
+            if (digits[0] == "0" || digits[0] == "0000")
+            {
+                Console.WriteLine("------------- Alarm Code is 0000 -------------");
+            }
+            else
+            {
+                Console.WriteLine("------------- Alarm Code is not 0000 -------------");
+                string alarm_message = e.Data.ToString();
+                string alarm_code = digits[0];
+                if (alarm_message == "clear_alarm")
                 {
-                    Console.WriteLine("------------- Alarm Code is 0000 -------------");
-                }
-                else
-                {
-                    Console.WriteLine("------------- Alarm Code is not 0000 -------------");
-                    string alarm_code = digits[0];
-                    var data = new
+                    Console.WriteLine("------------- Clear Alarm Message -------------");
+                    Movement_handle.Clear_alarm();
+                    alarm_code = "0000";
+                    var alarm_data = new
                     {
                         alarm_code
                     };
 
-                    string jsonData = JsonConvert.SerializeObject(data);
-                    ws.Send(jsonData);
+                    string alarm_jsonData = JsonConvert.SerializeObject(alarm_data);
+                    ws.Send(alarm_jsonData);
                     return;
                 }
-            }
-            else
-            {
-                Console.WriteLine("------------- Alarm Code is not 16 digits -------------");
+
+                    
+                var data = new
+                {
+                    alarm_code
+                };
+
+                string jsonData = JsonConvert.SerializeObject(data);
+                ws.Send(jsonData);
+                return;
             }
 
             Console.WriteLine("------------- WebSocket OnMessage -------------");
@@ -109,11 +119,6 @@ namespace hiwin_online_control_01
 
                 string jsonData = JsonConvert.SerializeObject(data);
                 ws.Send(jsonData);
-            }
-            else if(message == "clear_alarm")
-            {
-                Console.WriteLine("------------- Clear Alarm Message -------------");
-                Movement_handle.Clear_alarm();
             }
             else
             {
