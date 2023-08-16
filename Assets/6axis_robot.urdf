@@ -1,0 +1,193 @@
+<robot name="6axis_robot">
+
+	<!-- * * * Link Definitions * * * -->
+
+  	<link name="base_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<cylinder radius="0.14" length="0.1"/>
+			</geometry>
+	     	<material name="Black">
+				<color rgba="0 0 0 1"/>
+			</material>
+	   </visual>
+	</link>
+
+  	<link name="upperbase_link">
+		<visual>
+			<origin xyz="0 0 0.1" rpy="0 0 0"/>
+			<geometry>
+				<cylinder radius="0.1" length="0.1"/>
+			</geometry>
+	     	<material name="Grey2">
+				<color rgba="0.9 0.9 0.9 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="torso_link">
+		<visual>
+			<origin xyz="0 0 0.05" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.05 0.05 0.1"/>
+			</geometry>
+	     	<material name="Green1">
+				<color rgba="0 1 0 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="shoulder_link">
+		<visual>
+			<origin xyz="0 0 0.15" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.12 0.12 0.4"/>
+			</geometry>
+	     	<material name="Blue1">
+				<color rgba="0 0 0.8 1.0"/>
+			</material>
+	   </visual>
+	</link>
+
+	<link name="upperarm_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.05 0.05 0.05"/>
+			</geometry>
+	     	<material name="Green2">
+				<color rgba="0 1 0 1.0"/>
+			</material>
+	   </visual>
+	</link>
+
+	<link name="arm_link">
+		<visual>
+			<origin xyz="0 0 0.1" rpy="0 0 1.57"/>
+			<geometry>
+				<box size="0.1 0.1 0.3"/>
+			</geometry>
+	     	<material name="Blue2">
+				<color rgba="0 0.2 0.8 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="elbow_link">
+		<visual>
+			<origin xyz="0 0 -0.05" rpy="0 0 0"/>
+			<geometry>
+				<cylinder radius="0.05" length="0.125"/>
+			</geometry>
+	     	<material name="Black2">
+				<color rgba="0.1 0.1 0.1 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="forearm_link">
+		<visual>
+			<origin xyz="0 0 -0.025" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.07 0.07 0.175"/>
+			</geometry>
+	     	<material name="Grey3">
+				<color rgba="0.5 0.5 0.5 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="wrist_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.05 0.05 0.1"/>
+			</geometry>
+	     	<material name="Blue3">
+				<color rgba="0.1 0.4 0.9 1.0"/>
+			</material>
+	   </visual>
+	</link>
+	
+	<link name="hand_link">
+		<visual>
+			<origin xyz="0 0 -0.01" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.035 0.035 0.05"/>
+			</geometry>
+	     	<material name="Black4">
+				<color rgba="0.3 0.3 0.3 1.0"/>
+			</material>
+	   </visual>
+	</link>    
+	
+	<!-- * * * Joint Definitions * * * -->
+
+	<joint name="base_joint" type="revolute">
+    	<parent link="base_link"/>
+    	<child link="upperbase_link"/>
+    	<origin xyz="0 0 0" rpy="0 0 0"/>
+    	<axis xyz="0 0 1"/>
+    	<limit lower="-2.88" upper="2.88" effort="10" velocity="3"/>
+  	</joint>
+	
+ 	<joint name="upperbase_joint" type="fixed">
+    	<parent link="upperbase_link"/>
+    	<child link="torso_link"/>
+    	<origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint>
+	
+ 	<joint name="torso_joint" type="revolute">
+    	<parent link="torso_link"/>
+    	<child link="shoulder_link"/>
+    	<origin xyz="0 0 0.1" rpy="0 0 0"/>
+       	<limit lower="-2.18" upper="1.48" effort="10" velocity="3"/>
+        <axis xyz="0 1 0"/>
+	</joint>
+	
+	<joint name="shoulder_joint" type="fixed">
+    	<parent link="shoulder_link"/>
+    	<child link="upperarm_link"/>
+    	<origin xyz="0. 0 0.3" rpy="0 -1.57 0"/>
+	</joint>
+
+	<joint name="upperarm_joint" type="revolute">
+    	<parent link="upperarm_link"/>
+    	<child link="arm_link"/>
+    	<origin xyz="0 0 0" rpy="0 0 0"/>
+       	<limit lower="-0.96" upper="3.23" effort="10" velocity="3"/>
+        <axis xyz="0 1 0"/>
+	</joint>
+	
+ 	<joint name="arm_joint" type="fixed">
+    	<parent link="arm_link"/>
+    	<child link="elbow_link"/>
+    	<origin xyz="0 0 0.35" rpy="0 0 0"/>
+	</joint>
+	
+ 	<joint name="elbow_joint" type="revolute">
+    	<parent link="elbow_link"/>
+    	<child link="forearm_link"/>
+    	<origin xyz="0 0 0.1" rpy="0 0 0"/>
+       	<limit lower="-3.31" upper="3.31" effort="10" velocity="3"/>
+        <axis xyz="0 0 1"/>
+	</joint>
+
+ 	<joint name="forearm_joint" type="revolute">
+    	<parent link="forearm_link"/>
+    	<child link="wrist_link"/>
+    	<origin xyz="0 0 0.075" rpy="0 0 0"/>
+       	<limit lower="-2.01" upper="2.01" effort="10" velocity="3"/>
+        <axis xyz="0 1 0"/>
+	</joint>
+	
+ 	<joint name="wrist_joint" type="revolute">
+    	<parent link="wrist_link"/>
+    	<child link="hand_link"/>
+    	<origin xyz="0 0 0.075" rpy="0 0 0"/>
+        <limit lower="-6.28" upper="6.28" effort="10" velocity="3"/>
+        <axis xyz="0 0 1"/>
+	</joint>
+ 
+</robot>
