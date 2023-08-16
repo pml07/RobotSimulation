@@ -2,123 +2,172 @@ import torch
 import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
+MSE = nn.MSELoss(reduction='sum')
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-def total_loss(y, output):
+
+def calc_degree(y, output):
     # print('y: ', y)
     # print('real output: ',output) # grad
+    # print('--------',output[:, :, 0])
+    # print('=======', y[:, 0])
     r1 = ((output[:, 0] + 1) / 2) * (165 - (-165)) + (-165)
     r2 = ((output[:, 1] + 1) / 2) * (85 - (-125)) + (-125) 
     r3 = ((output[:, 2] + 1) / 2) * (185 - (-55)) + (-55)
     r4 = ((output[:, 3] + 1) / 2) * (190 - (-190)) + (-190)
     r5 = ((output[:, 4] + 1) / 2) * (115 - (-115)) + (-115)
-    r6 = ((output[:, 5] + 1) / 2) * (5 - (-5)) + (-5)
+    r6 = y[:, 5]
     
-    # output = "r1 = {}, r2 = {}, r3 = {}, r4 = {}, r5 = {}, r6 = {}".format(r1.item(), r2.item(), r3.item(), r4.item(), r5.item(), r6.item())
-    # with open("output/output.txt" , "a") as f:
-    #     f.write(output)
-    #     f.write("\n")
-    
-    loss = torch.abs(y[:, 0] - r1) + torch.abs(y[:, 1] - r2) + torch.abs(y[:, 2] - r3) + torch.abs(y[:, 3] - r4) + torch.abs(y[:, 4] - r5) + torch.abs(y[:, 5] - r6)
-    # print(loss)
-    return loss
+    deg1 = torch.abs(y[:, 0] - r1)
+    deg5 = torch.abs(y[:, 4] - r5)
+    return deg1, deg5
 
-def calculate_distance(x, output):   
+
+def calc_distance(x, y, output):   
+# 6 axis robot coordinate
     x1 = x[0][-1][0:3]
     x2 = x[0][-1][3:6]
     x3 = x[0][-1][6:9]
     x4 = x[0][-1][9:12]
     x5 = x[0][-1][12:15]
     x6 = x[0][-1][15:18]
-    # print('---------x6: ',x6)
+
+# hiwin 6 axis robot coordinate
+    p1 = torch.tensor([0.0, 0, 0.0]).to(DEVICE)
+    p2 = torch.tensor([0.0, 0.55, 0.0]).to(DEVICE)
+    p3 = torch.tensor([0.0, 0.55, -0.025]).to(DEVICE)
+    p4 = torch.tensor([0.0, 0.55, -0.175]).to(DEVICE)
+    p5 = torch.tensor([0.0, 0.55, -0.375]).to(DEVICE)
+    p6 = torch.tensor([0.0, 0.55, -0.45]).to(DEVICE)
     
-    p1 = torch.tensor([0.0, 0.0, 0.0]).to(DEVICE)
-    p2 = torch.tensor([0.0, 0.4, 0.0]).to(DEVICE)
-    p3 = torch.tensor([0.0, 0.8, 0.0]).to(DEVICE)
-    p4 = torch.tensor([0.0, 0.8, -0.3]).to(DEVICE)
-    p5 = torch.tensor([0.0, 0.8, -0.5]).to(DEVICE)
-    p6 = torch.tensor([0.0, 0.8, -0.6]).to(DEVICE)
+    v1 = torch.tensor([0.0, 0.0, 0.0]).to(DEVICE)
+    v2 = torch.tensor([0.0, 0.55, 0.0]).to(DEVICE)
+    v3 = torch.tensor([0.0, 0.0, -0.025]).to(DEVICE)
+    v4 = torch.tensor([0.0, 0.0, -0.15]).to(DEVICE)
+    v5 = torch.tensor([0.0, 0.0, -0.2]).to(DEVICE)
+    v6 = torch.tensor([0.0, 0.0, -0.075]).to(DEVICE)
     
-    r1 = ((output[:, 0] + 1) / 2) * (165 - (-165)) + (-165)  # y
+    # dnn
+    # r1 = ((output[:, :, 0] + 1) / 2) * (165 - (-165)) + (-165) 
+    # r1 = torch.deg2rad(r1)
+    # r2 = ((output[:, :, 1] + 1) / 2) * (85 - (-125)) + (-125) 
+    # r2 = torch.deg2rad(r2)
+    # r3 = ((output[:, :, 2] + 1) / 2) * (185 - (-55)) + (-55)
+    # r3 = torch.deg2rad(r3)
+    # r4 = ((output[:, :, 3] + 1) / 2) * (190 - (-190)) + (-190)
+    # r4 = torch.deg2rad(r4)
+    # r5 = ((output[:, :, 4] + 1) / 2) * (115 - (-115)) + (-115) 
+    # r5 = torch.deg2rad(r5)
+    # r6 = y[:, 5]
+    # r6 = torch.deg2rad(r6)
+
+    # lstm
+    r1 = ((output[:, 0] + 1) / 2) * (165 - (-165)) + (-165)
     r1 = torch.deg2rad(r1)
-    r2 = ((output[:, 1] + 1) / 2) * (85 - (-125)) + (-125)  # x
+    r2 = ((output[:, 1] + 1) / 2) * (85 - (-125)) + (-125) 
     r2 = torch.deg2rad(r2)
-    r3 = ((output[:, 2] + 1) / 2) * (185 - (-55)) + (-55)  # x
+    r3 = ((output[:, 2] + 1) / 2) * (185 - (-55)) + (-55)
     r3 = torch.deg2rad(r3)
-    r4 = ((output[:, 3] + 1) / 2) * (190 - (-190)) + (-190)  # y
+    r4 = ((output[:, 3] + 1) / 2) * (190 - (-190)) + (-190)
     r4 = torch.deg2rad(r4)
-    r5 = ((output[:, 4] + 1) / 2) * (115 - (-115)) + (-115)  # x
+    r5 = ((output[:, 4] + 1) / 2) * (115 - (-115)) + (-115)
     r5 = torch.deg2rad(r5)
-    r6 = ((output[:, 5] + 1) / 2) * (5 - (-5)) + (-5)  # y
+    r6 = y[:, 5]
     r6 = torch.deg2rad(r6)
     
+    # R1: 繞 y 軸 / R2: x / R3: x / R4: y / R5: x / R6: y
+    R1 = rot_y(r1)
+    R2 = rot_x(r2)
+    R3 = rot_x(r3)
+    R4 = rot_z(r4)
+    R5 = rot_x(r5)
+    R6 = rot_z(r6)
     
-    cos_r1 = torch.cos(r1)
-    sin_r1 = torch.sin(r1)
-    zeros1 = torch.zeros_like(r1)
-    row1 = torch.stack([cos_r1, zeros1, sin_r1], dim=1)
-    row2 = torch.stack([zeros1, torch.ones_like(r1), zeros1], dim=1)
-    row3 = torch.stack([-sin_r1, zeros1, cos_r1], dim=1)
-    R1 = torch.stack([row1, row2, row3], dim=1)
+    v1_ = R1 @ v1
+    p1_ = v1_
+    v2_ = R1 @ (R2 @ v2)
+    p2_ = p1_ + v2_
+    v3_ = R1 @ (R2 @ (R3 @ v3))
+    p3_ = p2_ + v3_
+    v4_ = R1 @ (R2 @ (R3 @ v4))
+    p4_ = p3_ + v4_
+    v5_ = R1 @ (R2 @ (R3 @ (R4 @ (R5 @ v5))))
+    p5_ = p4_ + v5_
+    v6_ = R1 @ (R2 @ (R3 @ (R4 @ (R5 @ v6))))
+    p6_ = p5_ + v6_
 
-    cos_r2 = torch.cos(r2)
-    sin_r2 = torch.sin(r2)
-    zeros2 = torch.zeros_like(r2)
-    row1 = torch.stack([torch.ones_like(r2), zeros2, zeros2], dim=1)
-    row2 = torch.stack([zeros2, cos_r2, -sin_r2], dim=1)
-    row3 = torch.stack([zeros2, sin_r2, cos_r2], dim=1)
-    R2 = torch.stack([row1, row2, row3], dim=1)
-    
-    cos_r3 = torch.cos(r3)
-    sin_r3 = torch.sin(r3)
-    zeros3 = torch.zeros_like(r3)
-    row1 = torch.stack([torch.ones_like(r3), zeros3, zeros3], dim=1)
-    row2 = torch.stack([zeros3, cos_r3, -sin_r3], dim=1)
-    row3 = torch.stack([zeros3, sin_r3, cos_r3], dim=1)
-    R3 = torch.stack([row1, row2, row3], dim=1)
-    
-    cos_r4 = torch.cos(r4)
-    sin_r4 = torch.sin(r4)
-    zeros4 = torch.zeros_like(r4)
-    row1 = torch.stack([cos_r4, zeros4, sin_r4], dim=1)
-    row2 = torch.stack([zeros4, torch.ones_like(r4), zeros4], dim=1)
-    row3 = torch.stack([-sin_r4, zeros4, cos_r4], dim=1)
-    R4 = torch.stack([row1, row2, row3], dim=1)
-    
-    cos_r5 = torch.cos(r5)
-    sin_r5 = torch.sin(r5)
-    zeros5 = torch.zeros_like(r5)
-    row1 = torch.stack([torch.ones_like(r5), zeros5, zeros5], dim=1)
-    row2 = torch.stack([zeros5, cos_r5, -sin_r5], dim=1)
-    row3 = torch.stack([zeros5, sin_r5, cos_r5], dim=1)
-    R5 = torch.stack([row1, row2, row3], dim=1)
-    
-    cos_r6 = torch.cos(r6)
-    sin_r6 = torch.sin(r6)
-    zeros6 = torch.zeros_like(r6)
-    row1 = torch.stack([cos_r6, zeros6, sin_r6], dim=1)
-    row2 = torch.stack([zeros6, torch.ones_like(r6), zeros6], dim=1)
-    row3 = torch.stack([-sin_r6, zeros6, cos_r6], dim=1)
-    R6 = torch.stack([row1, row2, row3], dim=1)
-    
-    R0 = torch.eye(3).to(DEVICE)  # identity matrix
-    
-    p1_ = R0 @ p1
-    p2_ = R2 @ R1 @ p2
-    p3_ = R3 @ R2 @ R1 @ p3
-    p4_ = R4 @ R3 @ R2 @ R1 @ p4
-    p5_ = R5 @ R4 @ R3 @ R2 @ R1 @ p5
-    p6_ = R6 @ R5 @ R4 @ R3 @ R2 @ R1 @ p6
-    
-    # print('p1: ', p1_)
-    # print('p2: ', p2_)
-    # print('p3: ', p3_)
-    # print('p4: ', p4_)
-    # print('p5: ', p5_)
-    # print('p6: ', p6_)
+    set1_points = torch.cat([x1, x2, x3, x4, x5, x6]).reshape(6,3)
+    set2_points = torch.cat([p1_, p2_, p3_, p4_, p5_, p6_]).reshape(6,3)
+    total_points = 50
 
-    loss = torch.dist(x1, p1_) + torch.dist(x2, p2_) + torch.dist(x3, p3_) + torch.dist(x4, p4_) + torch.dist(x5, p5_) + torch.dist(x6, p6_)
-    # print(loss)
-    return loss
+    num_intervals_set1 = set1_points.size(0) - 1
+    num_intervals_set2 = set2_points.size(0) - 1
 
+    num_points_per_interval_set1 = total_points // num_intervals_set1
+    num_points_per_interval_set2 = total_points // num_intervals_set2
+
+    remaining_points_set1 = total_points - (num_points_per_interval_set1 * num_intervals_set1)
+    remaining_points_set2 = total_points - (num_points_per_interval_set2 * num_intervals_set2)
+
+    interpolated_set1 = []
+    for i in range(num_intervals_set1):
+        start_point = set1_points[i]
+        end_point = set1_points[i + 1]
+        num_points = num_points_per_interval_set1 + (1 if i < remaining_points_set1 else 0)
+        weights = torch.linspace(0, 1, num_points).unsqueeze(1)
+        interpolated = torch.lerp(start_point, end_point, weights.to(DEVICE))
+        interpolated_set1.append(interpolated)
+    interpolated_set1 = torch.cat(interpolated_set1)
+
+    interpolated_set2 = []
+    for i in range(num_intervals_set2):
+        start_point = set2_points[i]
+        end_point = set2_points[i + 1]
+        num_points = num_points_per_interval_set2 + (1 if i < remaining_points_set2 else 0)
+        weights = torch.linspace(0, 1, num_points).unsqueeze(1)
+        interpolated = torch.lerp(start_point, end_point, weights.to(DEVICE))
+        interpolated_set2.append(interpolated)
+    interpolated_set2 = torch.cat(interpolated_set2)
+    
+    distance = MSE(interpolated_set1, interpolated_set2)
+    
+    dist6 = torch.norm(x6 - p6_)
+    loss_ = distance/50 + dist6*5
+    return loss_, dist6
+
+
+
+def rot_x(rad):
+    cos_ = torch.cos(rad)
+    sin_ = torch.sin(rad)
+    zero = torch.zeros_like(rad)
+    row1 = torch.stack([torch.ones_like(rad), zero, zero], dim=0).squeeze()
+    row2 = torch.stack([zero, cos_, sin_], dim=0).squeeze()
+    row3 = torch.stack([zero, -sin_, cos_], dim=0).squeeze()
+    Rx = torch.stack([row1, row2, row3], dim=1).to(DEVICE)
+    return Rx
+    
+def rot_y(rad):
+    cos_ = torch.cos(rad)
+    sin_ = torch.sin(rad)
+    zero = torch.zeros_like(rad)
+    row1 = torch.stack([cos_, zero, -sin_], dim=0).squeeze()
+    row2 = torch.stack([zero, torch.ones_like(rad), zero], dim=0).squeeze()
+    row3 = torch.stack([sin_, zero, cos_], dim=0).squeeze()
+    Ry = torch.stack([row1, row2, row3], dim=1).to(DEVICE)
+    return Ry
+    
+def rot_z(rad):
+    cos_ = torch.cos(rad)
+    sin_ = torch.sin(rad)
+    zero = torch.zeros_like(rad)
+    row1 = torch.stack([cos_, -sin_, zero], dim=0).squeeze()
+    row2 = torch.stack([sin_, cos_, zero], dim=0).squeeze()
+    row3 = torch.stack([zero, zero, torch.ones_like(rad)], dim=0).squeeze()
+    Rz = torch.stack([row1, row2, row3], dim=1).to(DEVICE)
+    return Rz
+
+# if __name__=='__main__':
+#     calc()

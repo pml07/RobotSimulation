@@ -1,40 +1,35 @@
 import json, pickle
 import numpy as np
-
+import math
 
 if __name__ == "__main__":
-
-    file = '../DataSet/pos/joint_06'
+    file = '../DataSet/demo/demo_13'
     
-    # Joint = ["lshoulder.x", "lshoulder.y", "lshoulder.z", "rshoulder.x", "rshoulder.y", "rshoulder.z",
-    #         "rarm.x", "rarm.y", "rarm.z", "rforearm.x", "rforearm.y", "rforearm.z", "rhand.x", "rhand.y", "rhand.z",
-    #         "rindex.x", "rindex.y", "rindex.z"]
-    Joint = ["j1x", "j1y", "j1z", "j2x", "j2y", "j2z", "j3x", "j3y", "j3z", "j4x", "j4y", "j4z", "j5x", "j5y", "j5z", "j6x", "j6y", "j6z",
-            "rot1", "rot2", "rot3", "rot4", "rot5", "rot6"]
-    content = []
-    with open(f'{file}.json','rb') as fjson:
-        for line in fjson.readlines():
+    Joint = ["j1x", "j1y", "j1z", "j2x", "j2y", "j2z", "j3x", "j3y", "j3z", "j4x", "j4y", "j4z", "j5x", "j5y", "j5z", "j6x", "j6y", "j6z"]
+    
+    content = []    
+    
+    with open(f'{file}.json', 'rb') as fjson:
+        lines = fjson.readlines()
+        total_lines = len(lines)
+        split_index = int(total_lines * 0.8)
+        
+        for i, line in enumerate(lines):
             data = json.loads(line)
-            coor = np.zeros(24)
-            # lshoulder_x = float(data["lshoulder.x"])
-            # lshoulder_y = float(data["lshoulder.y"])
-            # lshoulder_z = float(data["lshoulder.z"])
-            # for i, item in enumerate(Joint):
-            #     if item in data.keys():
-            #         if item[-1] == 'x':
-            #             coor[i] = float(data[item]) - lshoulder_x
-                        
-            #         elif item[-1] == 'y':
-            #             coor[i] = float(data[item]) - lshoulder_y
-            #         else:
-            #             coor[i] = float(data[item]) - lshoulder_z
-            for i, item in enumerate(Joint):
-                coor[i] = float(data[item])
+            coor = np.zeros(18)
+            
+            for j, item in enumerate(Joint):
+                if item in data.keys():
+                    coor[j] = float(data[item])
+            
             content.append(coor)
-    content = np.array(content)
-
-    with open (f'{file}.pkl','wb') as fpickle:
-        pickle.dump(content, fpickle)
-
-
+            
+            if i == split_index:
+                with open(f'{file}0.pkl', 'wb') as fpickle_train:
+                    pickle.dump(np.array(content), fpickle_train)
+                
+                content = []
+        
+        with open(f'{file}1.pkl', 'wb') as fpickle_test:
+            pickle.dump(np.array(content), fpickle_test)
 

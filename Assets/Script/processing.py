@@ -17,8 +17,8 @@ def get_data(dataset, dir, ca): # for train
             with open(os.path.join(filepath, file), 'rb') as f:
                 data = pickle.load(f)
             for i in range(0, len(data)):
-                input_data = np.array(data[i:i+10, :18]) # data[i:i+3, :18] pos
-                output_data =  np.array(data[i, 18:]) # data[i:i+3, 18:] rot
+                input_data = np.array(data[i:i+1, :18])
+                output_data =  np.array(data[i, 18:])
                 traindatas.append((input_data, output_data))
 
     data = {"x":[], "y":[]}
@@ -39,9 +39,9 @@ def get_single_data(dir, filename, file):
     with open(filepath, 'rb') as f:
         data = pickle.load(f)
     for i in range(0, len(data)):
-        input_data = np.array(data[i, :18])  # position
+        input_data = np.array(data[i, :18])
         datas.append(input_data)
-    return datas        
+    return datas
 
 
 if __name__ == '__main__':

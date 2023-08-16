@@ -7,39 +7,23 @@ from tqdm import tqdm
 import numpy as np
 import os
 import json, pickle
-import lstm, processing, loss
-import socket
+import dnn, lstm, processing, loss
 import matplotlib.pyplot as plt
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-dataset = 'data'
+
+dataset = 'demo'
 train_dir = 'train'
-train_ca = '01'
+train_ca = '0'
 test_dir = 'test'
-test_ca = '02'
+test_ca = '1'
 batch_size = 1
-save_path = os.path.join("ckpt", f"{dataset}_{train_dir}_{train_ca}")
-epochs = 250
-lr = 0.0001 # 0.00001
-best_loss = 1000
+save_path = os.path.join("ckpt", f"6to6_{dataset}_{train_dir}_{train_ca}")
+epochs = 300
+lr = 0.000001
+best_loss = 100
 
-
-# def send(output):
-#     rot_values = output.tolist()[0]
-#     send_msg = ','.join(str(f) for f in rot_values)
-#     # print("------send: ", send_msg)
-#     s_socket.sendall(send_msg.encode())
     
-# def receive():
-#     message = s_socket.recv(1024)
-#     message = message.decode('utf-8')  # string
-#     msg = [float(val) for tpl in message.split(";") for val in tpl.strip("()").split(",")] # list[float]
-#     # print(msg)
-#     r_pos = torch.tensor([msg], requires_grad=True)
-#     # print('r_pos: ', r_pos)
-#     return r_pos
-
-
 def save_result(save_path, result):
     with open(save_path + "/result.txt" , "a") as f:
         f.write(result)
@@ -68,14 +52,16 @@ def load_data():
     return train_, test_, train_sampler, test_sampler
 
 def load_model():
-    model = lstm.LSTM(input_size=18, hidden_size1=32, output_size=6, num_layers=1, dropout=0.2).to(DEVICE)
+    model = dnn.DNN()
+    # model = lstm.LSTM(input_size=15, hidden_size=16, output_size=4, num_layers=1).to(DEVICE)
+    # model = torch.load('ckpt/6to6_demo_train_0/best.pth')
     model = model.to(DEVICE)
     print('------model: ',model)
     return model
 
 
-def train(model, train_, test_, early_stop_patience=10):
-    best_loss = 1000
+def train(model, train_, test_, early_stop_patience=15, delta=100):
+    best_loss = 100
     optimizer = Adam(model.parameters(), lr=lr)
     # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
     lossList = []
@@ -88,55 +74,80 @@ def train(model, train_, test_, early_stop_patience=10):
     for epoch in range(epochs):
         # train
         train_lossList = []
+        dist6_train = []
+        deg1_train = []
+        deg5_train = []
         model.train()
         for i, (x, y) in enumerate(tqdm(train_)):
             x = x.to(DEVICE)
             y = y.to(DEVICE)
+            # print('---------------x: ', x)
+            # print('y: ', y)
             optimizer.zero_grad()
             output = model(x)
-            # print('---------------y: ', y)
-            # print('---------------output: ', output)
-            # send(output)
-            # r_pos = receive()
-            # print('-----------------r_pos: ', r_pos)
+            dist, dist6 = loss.calc_distance(x, y, output)  # distance
+            deg1, deg5 = loss.calc_degree(y, output)  # degree
             
-            # loss_ = loss.total_loss(y, output)  # degree
-            loss_ = loss.calculate_distance(x, output)  # distance
+            loss_ = dist*100 + deg1 + deg5  # loss weight 要試
             train_lossList.append(loss_)
+            dist6_train.append(dist6)
+
             loss_.backward()
             optimizer.step()
             # for name, p in model.named_parameters():
             #     print(name, 'gradient is', p.grad)
-        
         train_loss = sum(train_lossList) / len(train_lossList)
+        dist6_loss = sum(dist6_train) / len(dist6_train)
+        deg1_loss = sum(deg1_train) / len(deg1_train)
+        deg5_loss = sum(deg5_train) / len(deg5_train)
+        robot_loss = "dist6 = {}, deg1 = {}, deg5 = {}".format(dist6_loss.item(), deg1_loss.item(), deg5_loss.item())
+        with open(f"output/training_loss.txt", "a") as f:
+            f.write(robot_loss)
+            f.write("\n")
+
         # scheduler.step()
 
         # test
         test_lossList = []
+        dist6_test = []
+        deg1_test = []
+        deg5_test = []
         model.eval()
         with torch.no_grad():
             for i, (x, y) in enumerate(tqdm(test_)):
                 x = x.to(DEVICE)
                 y = y.to(DEVICE)
+
                 output = model(x)
-                # send(output)
-                # r_pos = receive()
-                
-                # loss_ = loss.total_loss(y, output) # degree
-                loss_ = loss.calculate_distance(x, output)  # distance
+                dist, dist6 = loss.calc_distance(x, y,output)  # distance
+                deg1, deg5 = loss.calc_degree(y, output)  # degree
+
+                loss_ = dist*100 + deg1 + deg5  # loss 權重自己試
                 test_lossList.append(loss_)
+                dist6_test.append(dist6)
+                deg1_test.append(deg1)
+                deg5_test.append(deg5)
             test_loss = sum(test_lossList) / len(test_lossList)
+            dist6_loss = sum(dist6_test) / len(dist6_test)
+            deg1_loss = sum(deg1_test) / len(deg1_test)
+            deg5_loss = sum(deg5_test) / len(deg5_test)
+            robot_loss = "dist6 = {}, deg1 = {}, deg5 = {}".format(dist6_loss.item(), deg1_loss.item(), deg5_loss.item())
+            with open(f"output/test_loss.txt", "a") as f:
+                f.write(robot_loss)
+                f.write("\n")
                 
         # save model
-        if train_loss < best_loss:
+        if test_loss < best_loss:
             torch.save(model, model_path + "/best.pth")
-            best_loss = train_loss
-            no_improvement = 0
+            best_loss = test_loss
         else:
-            no_improvement += 1
             torch.save(model, model_path + "/last.pth")
         
         # early stopping
+        if (test_loss - train_loss) > delta:
+            no_improvement += 1
+        else:
+            no_improvement += 0
         if no_improvement >= early_stop_patience:
             print(f"No improvement for {early_stop_patience} epochs. Early stopping.")
             break
@@ -168,23 +179,13 @@ def plot():
     plt.plot(epochs, train_losses, label="Training Loss")
     plt.plot(epochs, test_losses, label="Test Loss")
     plt.xlabel("Epoch")
-    plt.ylabel("Loss")
+    plt.ylabel("Loss (deg)")
     plt.title("Loss")
     plt.legend()
     plt.savefig(save_path + "/loss.png")
      
 
 if __name__=='__main__':
-    # TCP_IP = 'localhost'
-    # TCP_PORT = 8080
-
-    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # s.bind((TCP_IP, TCP_PORT))
-    # s.listen()
-    # s_socket, addr = s.accept()
-    # print("connected to client")
-
     # save log
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
@@ -192,12 +193,8 @@ if __name__=='__main__':
                 "lr":lr, "batch_size":batch_size, "epochs":epochs}
         with open(save_path + '/opt.json', 'w') as fp:
             json.dump(opt, fp)
-    # try:
     # train
     model = load_model()
     train_, test_, train_sampler, test_sampler = load_data()
     train(model, train_, test_)
     plot()
-
-    # except(KeyboardInterrupt):
-    #     s.close()

@@ -6,7 +6,7 @@ import os
 from tqdm import tqdm
 from processing import get_single_data
 import torch
-import socket
+# import socket
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -33,43 +33,54 @@ def load_data(file):
     data = get_single_data(dataset, dir, file)
     return data
 
-def send(out):
-    rot_values = [str(round(rot.item(), 4)) for rot in out]
-    send_msg = ','.join(rot_values)
-    s_socket.sendall(send_msg.encode())
+# def send(out):
+#     rot_values = [str(round(rot.item(), 4)) for rot in out]
+#     send_msg = ','.join(rot_values)
+#     send_socket.sendall(send_msg.encode())
 
-def receive():
-    message = s_socket.recv(1024)
-    message = message.decode('utf-8')
-    msg = [float(val) for tpl in message.split(";") for val in tpl.strip("()").split(",")]
-    # print(msg)
-    return msg
+# def receive():
+#     message = receive_socket.recv(1024)
+#     message = message.decode('utf-8')
+#     msg = [float(val) for tpl in message.split(";") for val in tpl.strip("()").split(",")]
+#     # print(msg)
+#     return msg
     
     
 def main(): 
+    path = os.path.join("ckpt", args.model)
     data = load_data(file)
     model = load_model()
     for line in data:
-        data_tensor = torch.tensor(line).float().unsqueeze(0).unsqueeze(0).to(DEVICE)
-        # print(data_tensor)
-        output, mean, log_var = model(data_tensor)
-        for out in output:
-            send(out)
-            msg = receive()
-            # print(msg)
+        print('original input: ', line)
+        data_tensor = torch.tensor(line[0:15]).float().unsqueeze(0).unsqueeze(0).to(DEVICE)
+        print('model input: ', data_tensor)
+        output = model(data_tensor)
+        print('output: ', output)
+        output = output.tolist()[0]
+        j1 = ((output[0] + 1) / 2) * (165 - (-165)) + (-165)
+        j2 = ((output[1] + 1) / 2) * (85 - (-125)) + (-125) 
+        j3 = ((output[2] + 1) / 2) * (185 - (-55)) + (-55)
+        j4 = ((output[3] + 1) / 2) * (190 - (-190)) + (-190)
+        j5 = ((output[4] + 1) / 2) * (115 - (-115)) + (-115)
+        j6 = line[19]
+        
+        out = "rot1 = {}, rot2 = {}, rot3 = {}, rot4 = {}, rot5 = {}, rot6 = {}".format(j1, j2, j3, j4, j5, j6)
+        with open(path + "_predict.txt", "a") as f:
+            f.write(out)
+            f.write("\n")
+            
     print('Finish!')        
 
 if __name__ == '__main__':
-    TCP_IP = '127.0.0.1'
-    TCP_PORT = 8080
+    # UDP_IP = '127.0.0.1'
+    # UDP_SEND_PORT = 5065
+    # UDP_RECEIVE_PORT = 5066
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((TCP_IP, TCP_PORT))
-    s.listen()
-    s_socket, addr = s.accept()
-    print("conected to client")
+    # send_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    # send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    # receive_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # receive_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # receive_socket.bind((UDP_IP, UDP_RECEIVE_PORT))
     
     main()
-    
-    s.close()
