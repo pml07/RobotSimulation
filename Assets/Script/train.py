@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-dataset = 'demo'
+dataset = '6-6-2'
 train_dir = 'train'
-train_ca = '0'
+train_ca = '20'
 test_dir = 'test'
-test_ca = '1'
+test_ca = '21'
 batch_size = 1
 save_path = os.path.join("ckpt", f"6to6_{dataset}_{train_dir}_{train_ca}")
 epochs = 300
